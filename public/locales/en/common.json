@@ -1,0 +1,172 @@
+{
+  "home": {
+    "title": "ViveSano",
+    "description": "Transform your habits and improve your well-being with our intuitive and modern platform.",
+    "gamification": "Earn achievements and rewards for your healthy habits!",
+    "gamificationDesc": "Level up, earn points and unlock badges as you improve your well-being.",
+    "cta": {
+      "register": "Start now",
+      "title": "Ready to transform your life by playing?",
+      "desc": "Join for free, create positive habits and unlock rewards as you level up."
+    },
+    "section1": {
+      "title": "Comprehensive Health + Gamification",
+      "desc": "Get personalized recommendations and earn points for every healthy habit you complete."
+    },
+    "section2": {
+      "title": "Tracking and Achievements",
+      "desc": "Monitor your progress, unlock badges and level up while staying motivated."
+    },
+    "section3": {
+      "title": "Healthy Challenges",
+      "desc": "Participate in individual challenges focused on physical activity, nutrition and emotional well-being. Achievements and rewards are personal."
+    }
+  },
+  "header": {
+    "logo": "ViveSano",
+    "nav": {
+      "home": "Home",
+      "about": "About Us",
+      "help": "Help",
+      "contact": "Contact"
+    },
+    "search": {
+      "placeholder": "Search..."
+    },
+    "lang": {
+      "es": "ES",
+      "en": "EN"
+    },
+    "theme": "Change theme",
+    "login": "Login"
+  },
+  "footer": {
+    "copyright": "© 2025 ViveSano. All rights reserved.",
+    "about": "About us",
+    "help": "Help",
+    "contact": "Contact"
+  },
+  "about": {
+    "title": "About Us",
+    "mission": { "title": "Our mission", "desc": "Inspire and support people in building healthy habits, making the process fun, sustainable and accessible to all." },
+    "vision": { "title": "Our vision", "desc": "To be the leading community in wellness and healthy habits, promoting personal growth and mutual support through gamification and technology." },
+    "values": {
+      "empathy": { "title": "Empathy", "desc": "We put people at the center." },
+      "innovation": { "title": "Innovation", "desc": "We seek new ways to motivate and support." },
+      "inclusion": { "title": "Inclusion", "desc": "We believe in wellness for all." },
+      "growth": { "title": "Growth", "desc": "We foster learning and self-improvement." }
+    },
+    "team": {
+      "title": "Our team",
+      "members": [
+        { "name": "Andrea López", "role": "Founder", "quote": "Consistency is the key to success." },
+        { "name": "Carlos Pérez", "role": "Developer", "quote": "Technology at the service of wellness." },
+        { "name": "María Torres", "role": "Designer", "quote": "Design also motivates." }
+      ]
+    },
+    "commitment": { "title": "Our commitment", "desc": "We are committed to creating a safe, motivating and accessible space so that everyone can reach their best version, relying on community and technology." }
+  },
+  "help": {
+    "title": "Help",
+    "subtitle": "How can we help you?",
+    "description": "Find answers to the most frequently asked questions or contact our support team.",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        { "q": "How can I create an account?", "a": "Click on 'Login' and select 'Create new account'. Enter your details and confirm your email to activate your account." },
+        { "q": "I forgot my password, how do I recover it?", "a": "On the login page, click 'Forgot your password?', enter your email and follow the instructions sent to you." },
+        { "q": "How do I change my email or personal data?", "a": "Go to your profile and select 'Edit data'. Save the changes to update your account." },
+        { "q": "Can I change the platform language?", "a": "Yes, use the language selector at the top right. Your preference will be saved for future visits." },
+        { "q": "How do I contact support?", "a": "You can write to soporte@vivesano.com, use the contact form or the help chat available on the website." },
+        { "q": "What benefits do I get from using ViveSano?", "a": "You improve your physical and mental health, earn rewards and access exclusive content about healthy habits." },
+        { "q": "Is ViveSano free or does it have a cost?", "a": "You can register and use most features for free. Some premium features may require a subscription." },
+        { "q": "How does gamification work?", "a": "You earn points, achievements and badges by completing healthy habits and challenges. You can level up and unlock rewards." },
+        { "q": "Can I use ViveSano on my mobile?", "a": "Yes, the website is responsive and you can access it from any mobile device or tablet." },
+        { "q": "How do I log my habits or activities?", "a": "From your main dashboard, select the habit you want to log and mark it as completed. You can add new habits from the corresponding section." },
+        { "q": "What if I don't receive the confirmation email?", "a": "Check your spam or junk folder. If you can't find it, request a resend from the login page." },
+        { "q": "How can I suggest an improvement or report a bug?", "a": "In the contact section you can send your suggestions or report bugs to the team." },
+        { "q": "Are my data protected?", "a": "Yes, we comply with data protection regulations and your information is safe and encrypted." },
+        { "q": "Can I delete my account?", "a": "Yes, you can request account deletion from your profile or by writing to soporte@vivesano.com." },
+        { "q": "What kind of challenges are available?", "a": "There are individual challenges focused on physical activity, nutrition, emotional well-being and more. You can join from the challenges section." },
+        { "q": "How does the points system work?", "a": "You earn points for every completed habit and challenge. Points help you level up and unlock rewards." },
+        { "q": "Can I connect with other users or is there a community?", "a": "Currently ViveSano does not have community features or user connections. All activities and achievements are personal." }
+      ],
+      "noResults": "No related questions found."
+    },
+    "contact": { "title": "Need more help?", "desc": "Our support team is available to help you with anything you need.", "cta": "Contact support" }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Do you have any questions or suggestions?",
+    "description": "Fill out the form or use the alternative contact details to reach us.",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "youremail@example.com",
+      "message": "Message",
+      "messagePlaceholder": "Write your message here...",
+      "cta": "Send message"
+    },
+    "alt": {
+      "email": "Email",
+      "phone": "Phone"
+    }
+  },
+    "auth": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "login": "Sign in",
+    "register": "Don't have an account? Register",
+    "forgot": "Forgot your password?",
+    "error": {
+      "required": "All fields are required.",
+      "invalid": "Incorrect credentials."
+    }
+  }
+  ,
+  "register": {
+    "title": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "cta": "Create account",
+    "login": "Already have an account? Sign in",
+    "loading": "Registering...",
+    "success": "Registration successful! Check your email to confirm your account.",
+    "error": {
+      "required": "All fields are required.",
+      "passwordMatch": "Passwords do not match.",
+      "invalid": "Could not create account."
+    }
+  }
+  ,
+  "forgot": {
+    "title": "Reset password",
+    "email": "Email",
+    "cta": "Send email",
+    "loading": "Sending...",
+    "success": "Recovery email sent! Check your inbox.",
+    "login": "Back to login",
+    "error": {
+      "required": "Email is required.",
+      "invalid": "Could not send recovery email."
+    }
+  }
+  ,
+  "reset": {
+    "title": "Reset password",
+    "password": "New password",
+    "confirmPassword": "Confirm new password",
+    "cta": "Reset password",
+    "loading": "Resetting...",
+    "success": "Password successfully reset!",
+    "login": "Back to login",
+    "error": {
+      "required": "All fields are required.",
+      "passwordMatch": "Passwords do not match.",
+      "invalid": "Could not reset password."
+    }
+  }
+}

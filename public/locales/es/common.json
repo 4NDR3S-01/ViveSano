@@ -1,0 +1,172 @@
+{
+  "home": {
+    "title": "ViveSano",
+    "description": "Transforma tus hábitos y mejora tu bienestar con nuestra plataforma intuitiva y moderna.",
+    "gamification": "¡Consigue logros y recompensas por tus hábitos saludables!",
+    "gamificationDesc": "Sube de nivel, gana puntos y desbloquea insignias mientras mejoras tu bienestar.",
+    "cta": {
+      "register": "Comenzar ahora",
+      "title": "¿Listo para transformar tu vida jugando?",
+      "desc": "Únete gratis, crea hábitos positivos y desbloquea recompensas mientras avanzas de nivel."
+    },
+    "section1": {
+      "title": "Salud Integral + Gamificación",
+      "desc": "Recibe recomendaciones personalizadas y gana puntos por cada hábito saludable que completes."
+    },
+    "section2": {
+      "title": "Seguimiento y Logros",
+      "desc": "Monitorea tu progreso, desbloquea insignias y sube de nivel mientras mantienes la motivación."
+    },
+    "section3": {
+      "title": "Retos Saludables",
+      "desc": "Participa en retos individuales enfocados en actividad física, alimentación y bienestar emocional. Los logros y recompensas son personales."
+    }
+  },
+  "header": {
+    "logo": "ViveSano",
+    "nav": {
+      "home": "Inicio",
+      "about": "Sobre Nosotros",
+      "help": "Ayuda",
+      "contact": "Contacto"
+    },
+    "search": {
+      "placeholder": "Buscar..."
+    },
+    "lang": {
+      "es": "ES",
+      "en": "EN"
+    },
+    "theme": "Cambiar tema",
+    "login": "Iniciar sesión"
+  },
+  "footer": {
+    "copyright": "© 2025 ViveSano. Todos los derechos reservados.",
+    "about": "Sobre nosotros",
+    "help": "Ayuda",
+    "contact": "Contacto"
+  },
+  "about": {
+    "title": "Sobre Nosotros",
+    "mission": { "title": "Nuestra misión", "desc": "Inspirar y acompañar a las personas en la construcción de hábitos saludables, haciendo el proceso divertido, sostenible y accesible para todos." },
+    "vision": { "title": "Nuestra visión", "desc": "Ser la comunidad líder en bienestar y hábitos saludables, promoviendo el crecimiento personal y el apoyo mutuo a través de la gamificación y la tecnología." },
+    "values": {
+      "empathy": { "title": "Empatía", "desc": "Ponemos a las personas en el centro." },
+      "innovation": { "title": "Innovación", "desc": "Buscamos nuevas formas de motivar y acompañar." },
+      "inclusion": { "title": "Inclusión", "desc": "Creemos en el bienestar para todos." },
+      "growth": { "title": "Crecimiento", "desc": "Fomentamos el aprendizaje y la superación." }
+    },
+    "team": {
+      "title": "Nuestro equipo",
+      "members": [
+        { "name": "Andrea López", "role": "Fundadora", "quote": "La constancia es la clave del éxito." },
+        { "name": "Carlos Pérez", "role": "Desarrollador", "quote": "La tecnología al servicio del bienestar." },
+        { "name": "María Torres", "role": "Diseñadora", "quote": "El diseño también motiva." }
+      ]
+    },
+    "commitment": { "title": "Nuestro compromiso", "desc": "Nos comprometemos a crear un espacio seguro, motivador y accesible para que cada persona pueda alcanzar su mejor versión, apoyándose en la comunidad y la tecnología." }
+  },
+  "help": {
+    "title": "Ayuda",
+    "subtitle": "¿En qué podemos ayudarte?",
+    "description": "Encuentra respuestas a las preguntas más frecuentes o contacta con nuestro equipo de soporte.",
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "items": [
+        { "q": "¿Cómo puedo crear una cuenta?", "a": "Haz clic en 'Iniciar sesión' y selecciona 'Crear cuenta nueva'. Ingresa tus datos y confirma tu correo electrónico para activar tu cuenta." },
+        { "q": "¿Olvidé mi contraseña, cómo la recupero?", "a": "En la página de inicio de sesión, haz clic en '¿Olvidaste tu contraseña?', ingresa tu correo y sigue las instrucciones que recibirás por email." },
+        { "q": "¿Cómo cambio mi correo o datos personales?", "a": "Accede a tu perfil y selecciona la opción 'Editar datos'. Guarda los cambios para que se actualicen en tu cuenta." },
+        { "q": "¿Puedo cambiar el idioma de la plataforma?", "a": "Sí, usa el selector de idioma en la parte superior derecha. Tu preferencia se guardará para futuras visitas." },
+        { "q": "¿Cómo contacto con soporte?", "a": "Puedes escribirnos a soporte@vivesano.com, usar el formulario de contacto o el chat de ayuda disponible en la web." },
+        { "q": "¿Qué beneficios obtengo al usar ViveSano?", "a": "Mejoras tu salud física y mental, ganas recompensas y accedes a contenido exclusivo sobre hábitos saludables." },
+        { "q": "¿Es ViveSano gratis o tiene costo?", "a": "Puedes registrarte y usar la mayoría de las funciones sin costo. Algunas funciones premium pueden requerir suscripción." },
+        { "q": "¿Cómo funciona la gamificación?", "a": "Ganas puntos, logros e insignias al completar hábitos saludables y retos. Puedes subir de nivel y desbloquear recompensas." },
+        { "q": "¿Puedo usar ViveSano en mi móvil?", "a": "Sí, la web es responsiva y puedes acceder desde cualquier dispositivo móvil o tablet." },
+        { "q": "¿Cómo registro mis hábitos o actividades?", "a": "Desde tu panel principal, selecciona el hábito que quieres registrar y marca como completado. Puedes agregar nuevos hábitos desde la sección correspondiente." },
+        { "q": "¿Qué hago si no recibo el correo de confirmación?", "a": "Revisa tu bandeja de spam o correo no deseado. Si no lo encuentras, solicita el reenvío desde la página de inicio de sesión." },
+        { "q": "¿Cómo puedo sugerir una mejora o reportar un error?", "a": "En la sección de contacto puedes enviar tus sugerencias o reportar errores al equipo." },
+        { "q": "¿Mis datos están protegidos?", "a": "Sí, cumplimos con la normativa de protección de datos y tu información está segura y cifrada." },
+        { "q": "¿Puedo eliminar mi cuenta?", "a": "Sí, puedes solicitar la eliminación de tu cuenta desde tu perfil o escribiendo a soporte@vivesano.com." },
+        { "q": "¿Qué tipo de retos hay disponibles?", "a": "Hay retos individuales enfocados en actividad física, alimentación, bienestar emocional y más. Puedes unirte desde la sección de retos." },
+        { "q": "¿Cómo funciona el sistema de puntos?", "a": "Obtienes puntos por cada hábito completado y reto superado. Los puntos te ayudan a subir de nivel y desbloquear recompensas." },
+        { "q": "¿Puedo conectar con otros usuarios o hay comunidad?", "a": "Actualmente ViveSano no cuenta con funciones de comunidad ni conexión entre usuarios. Todas las actividades y logros son personales." }
+      ],
+      "noResults": "No se encontraron preguntas relacionadas."
+    },
+    "contact": { "title": "¿Necesitas más ayuda?", "desc": "Nuestro equipo de soporte está disponible para ayudarte en lo que necesites.", "cta": "Contactar soporte" }
+  },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "¿Tienes alguna pregunta o sugerencia?",
+    "description": "Completa el formulario o utiliza los datos de contacto alternativos para comunicarte con nosotros.",
+    "form": {
+      "name": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tucorreo@ejemplo.com",
+      "message": "Mensaje",
+      "messagePlaceholder": "Escribe tu mensaje aquí...",
+      "cta": "Enviar mensaje"
+    },
+    "alt": {
+      "email": "Correo",
+      "phone": "Teléfono"
+    }
+  },
+    "auth": {
+    "title": "Iniciar sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "login": "Entrar",
+    "register": "¿No tienes cuenta? Regístrate",
+    "forgot": "¿Olvidaste tu contraseña?",
+    "error": {
+      "required": "Todos los campos son obligatorios.",
+      "invalid": "Credenciales incorrectas."
+    }
+  }
+  ,
+  "register": {
+    "title": "Crear cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "cta": "Crear cuenta",
+    "login": "¿Ya tienes cuenta? Inicia sesión",
+    "loading": "Registrando...",
+    "success": "¡Registro exitoso! Revisa tu correo para confirmar la cuenta.",
+    "error": {
+      "required": "Todos los campos son obligatorios.",
+      "passwordMatch": "Las contraseñas no coinciden.",
+      "invalid": "No se pudo crear la cuenta."
+    }
+  }
+  ,
+  "forgot": {
+    "title": "Recuperar contraseña",
+    "email": "Correo electrónico",
+    "cta": "Enviar correo",
+    "loading": "Enviando...",
+    "success": "¡Correo de recuperación enviado! Revisa tu bandeja de entrada.",
+    "login": "Volver a iniciar sesión",
+    "error": {
+      "required": "El correo es obligatorio.",
+      "invalid": "No se pudo enviar el correo de recuperación."
+    }
+  }
+  ,
+  "reset": {
+    "title": "Restablecer contraseña",
+    "password": "Nueva contraseña",
+    "confirmPassword": "Confirmar nueva contraseña",
+    "cta": "Restablecer contraseña",
+    "loading": "Restableciendo...",
+    "success": "¡Contraseña restablecida con éxito!",
+    "login": "Volver a iniciar sesión",
+    "error": {
+      "required": "Todos los campos son obligatorios.",
+      "passwordMatch": "Las contraseñas no coinciden.",
+      "invalid": "No se pudo restablecer la contraseña."
+    }
+  }
+}
