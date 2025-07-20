@@ -5,6 +5,274 @@ import { useTheme } from "next-themes";
 import { supabase } from "../../supabaseClient";
 import '../../i18n';
 
+// Helper functions extracted outside the component to reduce complexity
+function getSupabaseErrorMessage(error: any, t: any) {
+  if (!error) return "";
+  switch (error.message) {
+    case 'Invalid login credentials':
+      return t('auth.error.invalidCredentials');
+    case 'User not found':
+      return t('auth.error.userNotFound');
+    case 'Too many requests':
+      return t('auth.error.tooManyAttempts');
+    case 'Network request failed':
+      return t('auth.error.networkError');
+    default:
+      return t('auth.error.invalid');
+  }
+}
+
+function validateEmailField(email: string, t: any) {
+  if (!email.trim()) {
+    return t('auth.error.emailRequired');
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return t('auth.error.emailInvalid');
+  }
+  return "";
+}
+
+function validatePasswordField(password: string, t: any) {
+  if (!password.trim()) {
+    return t('auth.error.passwordRequired');
+  }
+  if (password.length < 6) {
+    return t('auth.error.passwordTooShort');
+  }
+  return "";
+}
+
+async function submitLogin({
+  email,
+  password,
+  t,
+  setErrors,
+  setLoading,
+  setAnnounceMessage,
+  setAttemptCount,
+  attemptCount,
+  setIsBlocked,
+  setBlockTimeLeft,
+  submitButtonRef,
+  validateFieldsAndHandleFocus,
+  isBlocked,
+  blockTimeLeft,
+}: any) {
+  if (isBlocked) {
+    setAnnounceMessage(t('auth.error.blocked', { time: blockTimeLeft }));
+    setLoading(false);
+    return;
+  }
+  setErrors({ email: "", password: "", general: "" });
+  setLoading(true);
+  if (!validateFieldsAndHandleFocus()) {
+    setLoading(false);
+    return;
+  }
+  const newAttemptCount = attemptCount + 1;
+  setAttemptCount(newAttemptCount);
+  setAnnounceMessage(t('auth.loginAttempt', { count: newAttemptCount }));
+  try {
+    const { error: supabaseError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    });
+    setLoading(false);
+    if (supabaseError) {
+      const errorMessage = getSupabaseErrorMessage(supabaseError, t);
+      setErrors({ email: "", password: "", general: errorMessage });
+      setAnnounceMessage(errorMessage);
+      if (newAttemptCount >= 3) {
+        setIsBlocked(true);
+        setBlockTimeLeft(30);
+        setAnnounceMessage(t('auth.error.blocked', { time: 30 }));
+      }
+      if (submitButtonRef.current) {
+        submitButtonRef.current.focus();
+      }
+    } else {
+      setErrors({ email: "", password: "", general: "" });
+      setAttemptCount(0);
+      setAnnounceMessage("¡Inicio de sesión exitoso!");
+      const lang = localStorage.getItem('i18nextLng') || 'es';
+      window.location.href = `/dashboard?lng=${lang}`;
+    }
+  } catch (unknownError) {
+    setLoading(false);
+    console.error('Login error:', unknownError);
+    const errorMessage = t('auth.error.networkError');
+    setErrors({ email: "", password: "", general: errorMessage });
+    setAnnounceMessage(errorMessage);
+    if (submitButtonRef.current) {
+      submitButtonRef.current.focus();
+    }
+  }
+}
+
+function EmailField({
+  email,
+  emailInputRef,
+  handleEmailChange,
+  handleKeyDown,
+  validateEmailField,
+  t,
+  setErrors,
+  setAnnounceMessage,
+  errors,
+  fieldValidation,
+  getValidationClasses,
+}: any) {
+  return (
+    <div className="space-y-2">
+      <div className="relative">
+        <input
+          type="email"
+          ref={emailInputRef}
+          value={email}
+          onChange={(e) => handleEmailChange(e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, 'nextField')}
+          onBlur={() => {
+            const error = validateEmailField(email, t);
+            setErrors((prev: any) => ({ ...prev, email: error }));
+            if (error) setAnnounceMessage(error);
+          }}
+          placeholder={t('auth.email', { defaultValue: 'Correo electrónico' })}
+          className={`w-full pl-12 pr-12 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none ${getValidationClasses('email')}`}
+          aria-label={t('auth.email', { defaultValue: 'Correo electrónico' })}
+          aria-invalid={!!errors.email}
+          aria-describedby={`email-help ${errors.email ? "email-error" : ""} ${fieldValidation.email.isValid && fieldValidation.email.isTouched ? "email-success" : ""}`.trim()}
+          autoComplete="email"
+          required
+        />
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+          <span className="text-xl text-gray-500 dark:text-gray-400" aria-hidden="true">📧</span>
+        </div>
+        {fieldValidation.email.isTouched && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <span
+              className={`text-lg font-bold ${
+                fieldValidation.email.isValid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              }`}
+              aria-hidden="true"
+            >
+              {fieldValidation.email.isValid ? '✅' : '❌'}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="px-2">
+        <p id="email-help" className="text-xs text-gray-500 dark:text-gray-400">
+          💡 {t('auth.emailHelp', { defaultValue: 'Ingresa un email válido, ej: usuario@email.com' })}
+        </p>
+      </div>
+      <div className="px-2">
+        {errors.email && (
+          <div className="flex items-start gap-2 text-red-600 dark:text-red-400 text-sm animate-pulse bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-800">
+            <span className="text-base mt-0.5 flex-shrink-0" aria-label="Error">⚠️</span>
+            <p id="email-error" role="alert" aria-live="polite">{errors.email}</p>
+          </div>
+        )}
+        {fieldValidation.email.isValid && fieldValidation.email.isTouched && !errors.email && (
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
+            <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
+            <p id="email-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PasswordField({
+  password,
+  passwordInputRef,
+  handlePasswordChange,
+  handleKeyDown,
+  validatePasswordField,
+  t,
+  setErrors,
+  setAnnounceMessage,
+  errors,
+  fieldValidation,
+  getValidationClasses,
+  showPassword,
+  togglePasswordVisibility,
+}: any) {
+  return (
+    <div className="space-y-2">
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          ref={passwordInputRef}
+          value={password}
+          onChange={(e) => handlePasswordChange(e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, 'submit')}
+          onBlur={() => {
+            const error = validatePasswordField(password, t);
+            setErrors((prev: any) => ({ ...prev, password: error }));
+            if (error) setAnnounceMessage(error);
+          }}
+          placeholder={t('auth.password', { defaultValue: 'Contraseña' })}
+          className={`w-full pl-12 pr-20 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none ${getValidationClasses('password')}`}
+          aria-label={t('auth.password', { defaultValue: 'Contraseña' })}
+          aria-invalid={!!errors.password}
+          aria-describedby={`password-help ${errors.password ? "password-error" : ""} ${fieldValidation.password.isValid && fieldValidation.password.isTouched ? "password-success" : ""}`.trim()}
+          autoComplete="current-password"
+          required
+        />
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+          <span className="text-xl text-gray-500 dark:text-gray-400" aria-hidden="true">🔒</span>
+        </div>
+        <div className="absolute right-12 top-1/2 -translate-y-1/2">
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:text-blue-600 dark:focus:text-blue-400 transition-all duration-200 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20"
+            aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
+            tabIndex={0}
+          >
+            <span className="text-lg" aria-hidden="true">
+              {showPassword ? '🙈' : '👁️'}
+            </span>
+          </button>
+        </div>
+        {fieldValidation.password.isTouched && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <span
+              className={`text-lg font-bold ${
+                fieldValidation.password.isValid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              }`}
+              aria-hidden="true"
+            >
+              {fieldValidation.password.isValid ? '✅' : '❌'}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="px-2">
+        <p id="password-help" className="text-xs text-gray-500 dark:text-gray-400">
+          🔑 {t('auth.passwordHelp', { defaultValue: 'Ingresa tu contraseña (mínimo 6 caracteres)' })}
+        </p>
+      </div>
+      <div className="px-2">
+        {errors.password && (
+          <div className="flex items-start gap-2 text-red-600 dark:text-red-400 text-sm animate-pulse bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-800">
+            <span className="text-base mt-0.5 flex-shrink-0" aria-label="Error">⚠️</span>
+            <p id="password-error" role="alert" aria-live="polite">{errors.password}</p>
+          </div>
+        )}
+        {fieldValidation.password.isValid && fieldValidation.password.isTouched && !errors.password && (
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
+            <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
+            <p id="password-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function IniciarSesion() {
   // Forzar la clase dark y el idioma en <html> según preferencia del usuario
   const { t, i18n } = useTranslation();
@@ -30,9 +298,7 @@ export default function IniciarSesion() {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Hook para manejar el montaje del componente
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
   // Anunciar mensajes para lectores de pantalla
   useEffect(() => {
@@ -44,9 +310,7 @@ export default function IniciarSesion() {
 
   // Foco automático en el campo de email al cargar
   useEffect(() => {
-    if (emailInputRef.current) {
-      emailInputRef.current.focus();
-    }
+    if (emailInputRef.current) emailInputRef.current.focus();
   }, []);
 
   // Manejo del bloqueo temporal por intentos fallidos
@@ -87,73 +351,62 @@ export default function IniciarSesion() {
   // Effect para forzar re-renderización cuando cambia el tema
   useEffect(() => {
     if (mounted && resolvedTheme) {
-      // Forzar re-renderización de los inputs
       setFieldValidation(prev => ({ ...prev }));
     }
   }, [resolvedTheme, mounted]);
 
-  // Funciones de validación
-  const validateEmail = (email: string) => {
-    if (!email.trim()) {
-      return t('auth.error.emailRequired');
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return t('auth.error.emailInvalid');
-    }
-    return "";
-  };
-
-  const validatePassword = (password: string) => {
-    if (!password.trim()) {
-      return t('auth.error.passwordRequired');
-    }
-    if (password.length < 6) {
-      return t('auth.error.passwordTooShort');
-    }
-    return "";
-  };
-
-  // Validación en tiempo real para email
-  const handleEmailChange = (value: string) => {
+  // Helper for email change
+  function handleEmailChangeHelper(
+    value: string,
+    setEmail: React.Dispatch<React.SetStateAction<string>>,
+    setFieldValidation: React.Dispatch<React.SetStateAction<any>>,
+    setErrors: React.Dispatch<React.SetStateAction<any>>,
+    setAnnounceMessage: React.Dispatch<React.SetStateAction<string>>,
+    t: any,
+    errors: any
+  ) {
     setEmail(value);
-    const emailError = validateEmail(value);
+    const emailError = validateEmailField(value, t);
     const isValid = !emailError;
-    
-    setFieldValidation(prev => ({ 
-      ...prev, 
-      email: { isValid, isTouched: true }
-    }));
-    
+    setFieldValidation((prev: any) => ({ ...prev, email: { isValid, isTouched: true } }));
     if (errors.email || value.trim()) {
-      setErrors(prev => ({ ...prev, email: emailError, general: "" }));
+      setErrors((prev: any) => ({ ...prev, email: emailError, general: "" }));
     }
-
-    // Anunciar estado de validación para lectores de pantalla
     if (value.trim()) {
       setAnnounceMessage(isValid ? t('auth.fieldValid', { defaultValue: 'Válido' }) : emailError);
     }
-  };
-
-  // Validación en tiempo real para password
-  const handlePasswordChange = (value: string) => {
+  }
+  
+  // Helper for password change
+  function handlePasswordChangeHelper(
+    value: string,
+    setPassword: React.Dispatch<React.SetStateAction<string>>,
+    setFieldValidation: React.Dispatch<React.SetStateAction<any>>,
+    setErrors: React.Dispatch<React.SetStateAction<any>>,
+    setAnnounceMessage: React.Dispatch<React.SetStateAction<string>>,
+    t: any,
+    errors: any
+  ) {
     setPassword(value);
-    const passwordError = validatePassword(value);
+    const passwordError = validatePasswordField(value, t);
     const isValid = !passwordError;
-    
-    setFieldValidation(prev => ({ 
-      ...prev, 
-      password: { isValid, isTouched: true }
-    }));
-    
+    setFieldValidation((prev: any) => ({ ...prev, password: { isValid, isTouched: true } }));
     if (errors.password || value.trim()) {
-      setErrors(prev => ({ ...prev, password: passwordError, general: "" }));
+      setErrors((prev: any) => ({ ...prev, password: passwordError, general: "" }));
     }
-
-    // Anunciar estado de validación para lectores de pantalla
     if (value.trim()) {
       setAnnounceMessage(isValid ? t('auth.fieldValid', { defaultValue: 'Válido' }) : passwordError);
     }
+  }
+  
+  // Validación en tiempo real para email
+  const handleEmailChange = (value: string) => {
+    handleEmailChangeHelper(value, setEmail, setFieldValidation, setErrors, setAnnounceMessage, t, errors);
+  };
+  
+  // Validación en tiempo real para password
+  const handlePasswordChange = (value: string) => {
+    handlePasswordChangeHelper(value, setPassword, setFieldValidation, setErrors, setAnnounceMessage, t, errors);
   };
 
   // Función para alternar visibilidad de contraseña
@@ -180,16 +433,13 @@ export default function IniciarSesion() {
   // Función para obtener clases de validación
   const getValidationClasses = (field: 'email' | 'password') => {
     if (!mounted) return 'border-gray-300 bg-white text-gray-900 placeholder-gray-500';
-    
     const validation = fieldValidation[field];
     const isDark = resolvedTheme === 'dark';
-    
     if (!validation.isTouched) {
       return isDark 
         ? 'border-gray-600 bg-gray-800 text-gray-100 placeholder-gray-400 focus:border-purple-400 focus:ring-purple-400'
         : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-purple-600 focus:ring-purple-600';
     }
-    
     let resultClass = '';
     if (validation.isValid) {
       resultClass = isDark
@@ -216,34 +466,14 @@ export default function IniciarSesion() {
     return t('auth.login', { defaultValue: 'Ingresar' });
   };
 
-  // Mapear errores específicos de Supabase
-  const getSupabaseErrorMessage = (error: any) => {
-    if (!error) return "";
-    
-    switch (error.message) {
-      case 'Invalid login credentials':
-        return t('auth.error.invalidCredentials');
-      case 'User not found':
-        return t('auth.error.userNotFound');
-      case 'Too many requests':
-        return t('auth.error.tooManyAttempts');
-      case 'Network request failed':
-        return t('auth.error.networkError');
-      default:
-        return t('auth.error.invalid');
-    }
-  };
-
   // Helper to handle validation and focus
   const validateFieldsAndHandleFocus = () => {
-    const emailError = validateEmail(email);
-    const passwordError = validatePassword(password);
-
+    const emailError = validateEmailField(email, t);
+    const passwordError = validatePasswordField(password, t);
     if (emailError || passwordError) {
       setErrors({ email: emailError, password: passwordError, general: "" });
       setAnnounceMessage(t('auth.error.required'));
       setLoading(false);
-
       if (emailError && emailInputRef.current) {
         emailInputRef.current.focus();
       } else if (passwordError && passwordInputRef.current) {
@@ -254,76 +484,24 @@ export default function IniciarSesion() {
     return true;
   };
 
-  // Helper to handle supabase error
-  const handleSupabaseError = (supabaseError: any, newAttemptCount: number) => {
-    const errorMessage = getSupabaseErrorMessage(supabaseError);
-    setErrors({ email: "", password: "", general: errorMessage });
-    setAnnounceMessage(errorMessage);
-
-    if (newAttemptCount >= 3) {
-      setIsBlocked(true);
-      setBlockTimeLeft(30);
-      setAnnounceMessage(t('auth.error.blocked', { time: 30 }));
-    }
-
-    if (submitButtonRef.current) {
-      submitButtonRef.current.focus();
-    }
-  };
-
-  // Helper to handle network error
-  const handleNetworkError = (unknownError: any) => {
-    setLoading(false);
-    console.error('Login error:', unknownError);
-    const errorMessage = t('auth.error.networkError');
-    setErrors({ email: "", password: "", general: errorMessage });
-    setAnnounceMessage(errorMessage);
-
-    if (submitButtonRef.current) {
-      submitButtonRef.current.focus();
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (isBlocked) {
-      setAnnounceMessage(t('auth.error.blocked', { time: blockTimeLeft }));
-      return;
-    }
-
-    setErrors({ email: "", password: "", general: "" });
-    setLoading(true);
-
-    if (!validateFieldsAndHandleFocus()) {
-      return;
-    }
-
-    const newAttemptCount = attemptCount + 1;
-    setAttemptCount(newAttemptCount);
-    setAnnounceMessage(t('auth.loginAttempt', { count: newAttemptCount }));
-
-    try {
-      const { error: supabaseError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
-
-      setLoading(false);
-
-      if (supabaseError) {
-        handleSupabaseError(supabaseError, newAttemptCount);
-      } else {
-        setErrors({ email: "", password: "", general: "" });
-        setAttemptCount(0);
-        setAnnounceMessage("¡Inicio de sesión exitoso!");
-
-        const lang = localStorage.getItem('i18nextLng') || 'es';
-        window.location.href = `/dashboard?lng=${lang}`;
-      }
-    } catch (unknownError) {
-      handleNetworkError(unknownError);
-    }
+    await submitLogin({
+      email,
+      password,
+      t,
+      setErrors,
+      setLoading,
+      setAnnounceMessage,
+      setAttemptCount,
+      attemptCount,
+      setIsBlocked,
+      setBlockTimeLeft,
+      submitButtonRef,
+      validateFieldsAndHandleFocus,
+      isBlocked,
+      blockTimeLeft,
+    });
   };
 
   return (
@@ -333,153 +511,34 @@ export default function IniciarSesion() {
           {t('auth.title', { defaultValue: 'Iniciar sesión' })}
         </h1>
         <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <div className="relative">
-              <input
-                type="email"
-                ref={emailInputRef}
-                value={email}
-                onChange={(e) => handleEmailChange(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, 'nextField')}
-                onBlur={() => {
-                  const error = validateEmail(email);
-                  setErrors(prev => ({ ...prev, email: error }));
-                  if (error) setAnnounceMessage(error);
-                }}
-                placeholder={t('auth.email', { defaultValue: 'Correo electrónico' })}
-                className={`w-full pl-12 pr-12 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none ${getValidationClasses('email')}`}
-                aria-label={t('auth.email', { defaultValue: 'Correo electrónico' })}
-                aria-invalid={!!errors.email}
-                aria-describedby={`email-help ${errors.email ? "email-error" : ""} ${fieldValidation.email.isValid && fieldValidation.email.isTouched ? "email-success" : ""}`.trim()}
-                autoComplete="email"
-                required
-              />
-              
-              {/* Icono de email */}
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <span className="text-xl text-gray-500 dark:text-gray-400" aria-hidden="true">📧</span>
-              </div>
-              
-              {/* Indicador de validación */}
-              {fieldValidation.email.isTouched && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <span 
-                    className={`text-lg font-bold ${
-                      fieldValidation.email.isValid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                    }`}
-                    aria-hidden="true"
-                  >
-                    {fieldValidation.email.isValid ? '✅' : '❌'}
-                  </span>
-                </div>
-              )}
-            </div>
-            
-            {/* Texto de ayuda */}
-            <div className="px-2">
-              <p id="email-help" className="text-xs text-gray-500 dark:text-gray-400">
-                💡 {t('auth.emailHelp', { defaultValue: 'Ingresa un email válido, ej: usuario@email.com' })}
-              </p>
-            </div>
-            
-            {/* Mensajes de estado */}
-            <div className="px-2">
-              {errors.email && (
-                <div className="flex items-start gap-2 text-red-600 dark:text-red-400 text-sm animate-pulse bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-800">
-                  <span className="text-base mt-0.5 flex-shrink-0" aria-label="Error">⚠️</span>
-                  <p id="email-error" role="alert" aria-live="polite">{errors.email}</p>
-                </div>
-              )}
-              
-              {fieldValidation.email.isValid && fieldValidation.email.isTouched && !errors.email && (
-                <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
-                  <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
-                  <p id="email-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                ref={passwordInputRef}
-                value={password}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, 'submit')}
-                onBlur={() => {
-                  const error = validatePassword(password);
-                  setErrors(prev => ({ ...prev, password: error }));
-                  if (error) setAnnounceMessage(error);
-                }}
-                placeholder={t('auth.password', { defaultValue: 'Contraseña' })}
-                className={`w-full pl-12 pr-20 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none ${getValidationClasses('password')}`}
-                aria-label={t('auth.password', { defaultValue: 'Contraseña' })}
-                aria-invalid={!!errors.password}
-                aria-describedby={`password-help ${errors.password ? "password-error" : ""} ${fieldValidation.password.isValid && fieldValidation.password.isTouched ? "password-success" : ""}`.trim()}
-                autoComplete="current-password"
-                required
-              />
-              
-              {/* Icono de contraseña */}
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <span className="text-xl text-gray-500 dark:text-gray-400" aria-hidden="true">🔒</span>
-              </div>
-              
-              {/* Botón mostrar/ocultar contraseña */}
-              <div className="absolute right-12 top-1/2 -translate-y-1/2">
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:text-blue-600 dark:focus:text-blue-400 transition-all duration-200 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20"
-                  aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
-                  tabIndex={0}
-                >
-                  <span className="text-lg" aria-hidden="true">
-                    {showPassword ? '🙈' : '👁️'}
-                  </span>
-                </button>
-              </div>
-
-              {/* Indicador de validación */}
-              {fieldValidation.password.isTouched && (
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <span 
-                    className={`text-lg font-bold ${
-                      fieldValidation.password.isValid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                    }`}
-                    aria-hidden="true"
-                  >
-                    {fieldValidation.password.isValid ? '✅' : '❌'}
-                  </span>
-                </div>
-              )}
-            </div>
-            
-            {/* Texto de ayuda */}
-            <div className="px-2">
-              <p id="password-help" className="text-xs text-gray-500 dark:text-gray-400">
-                🔑 {t('auth.passwordHelp', { defaultValue: 'Ingresa tu contraseña (mínimo 6 caracteres)' })}
-              </p>
-            </div>
-            
-            {/* Mensajes de estado */}
-            <div className="px-2">
-              {errors.password && (
-                <div className="flex items-start gap-2 text-red-600 dark:text-red-400 text-sm animate-pulse bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-800">
-                  <span className="text-base mt-0.5 flex-shrink-0" aria-label="Error">⚠️</span>
-                  <p id="password-error" role="alert" aria-live="polite">{errors.password}</p>
-                </div>
-              )}
-              
-              {fieldValidation.password.isValid && fieldValidation.password.isTouched && !errors.password && (
-                <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
-                  <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
-                  <p id="password-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
-                </div>
-              )}
-            </div>
-          </div>
+          <EmailField
+            email={email}
+            emailInputRef={emailInputRef}
+            handleEmailChange={handleEmailChange}
+            handleKeyDown={handleKeyDown}
+            validateEmailField={validateEmailField}
+            t={t}
+            setErrors={setErrors}
+            setAnnounceMessage={setAnnounceMessage}
+            errors={errors}
+            fieldValidation={fieldValidation}
+            getValidationClasses={getValidationClasses}
+          />
+          <PasswordField
+            password={password}
+            passwordInputRef={passwordInputRef}
+            handlePasswordChange={handlePasswordChange}
+            handleKeyDown={handleKeyDown}
+            validatePasswordField={validatePasswordField}
+            t={t}
+            setErrors={setErrors}
+            setAnnounceMessage={setAnnounceMessage}
+            errors={errors}
+            fieldValidation={fieldValidation}
+            getValidationClasses={getValidationClasses}
+            showPassword={showPassword}
+            togglePasswordVisibility={togglePasswordVisibility}
+          />
           
           {/* Alertas del sistema */}
           <div className="space-y-3">
