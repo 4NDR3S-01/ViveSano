@@ -261,7 +261,36 @@
   },
   "dashboard": {
     "title": "Bienvenido al Dashboard",
-    "stats": "Tus estadísticas",
-    "welcome": "¡Hola! Comienza tu viaje hacia una vida más saludable"
+    "stats": "Tus estadísticas", 
+    "welcome": "¡Hola! Comienza tu viaje hacia una vida más saludable",
+    "nav": {
+      "overview": "Resumen",
+      "habits": "Hábitos",
+      "challenges": "Retos",
+      "progress": "Progreso",
+      "achievements": "Logros",
+      "profile": "Perfil",
+      "settings": "Configuración",
+      "logout": "Cerrar sesión"
+    },
+    "sidebar": {
+      "toggle": "Alternar menú lateral",
+      "collapse": "Contraer menú",
+      "expand": "Expandir menú"
+    },
+    "overview": {
+      "title": "Resumen General",
+      "subtitle": "Tu progreso de hoy",
+      "habits_completed": "Hábitos completados",
+      "current_streak": "Racha actual",
+      "total_points": "Puntos totales",
+      "level": "Nivel"
+    },
+    "quick_actions": {
+      "title": "Acciones rápidas",
+      "add_habit": "Agregar hábito",
+      "log_activity": "Registrar actividad",
+      "view_challenges": "Ver retos"
+    }
   }
 }

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "next-themes";
-import { supabase } from "@/supabaseClient";
+import { supabase } from "../../supabaseClient";
 import "../../i18n";
 
 export default function Registrarse() {
@@ -63,6 +63,35 @@ export default function Registrarse() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Verificación automática de sesión existente para usuarios ya logueados
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      if (!mounted || loading) return;
+      
+      console.log('Verificando sesión existente en página de registro...');
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('Sesión existente en registro:', { 
+          hasSession: !!session, 
+          hasUser: !!session?.user, 
+          userEmail: session?.user?.email 
+        });
+        
+        if (session?.user && !error) {
+          console.log('Usuario ya logueado, redirigiendo al dashboard...');
+          window.location.href = '/dashboard';
+        }
+      } catch (error) {
+        console.error('Error verificando sesión existente:', error);
+      }
+    };
+
+    if (mounted) {
+      const timeoutId = setTimeout(checkExistingSession, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [mounted, loading]);
 
   // Efectos para manejo de mensajes y foco
   useEffect(() => {
@@ -508,7 +537,7 @@ export default function Registrarse() {
     setError("");
     setSuccess("");
     setErrors({ name: "", email: "", password: "", confirmPassword: "", general: "" });
-    
+
     // Validar todos los campos
     const nameError = validateName(name);
     const emailError = validateEmail(email);

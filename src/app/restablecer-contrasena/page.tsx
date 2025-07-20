@@ -6,6 +6,7 @@ import '../../i18n';
 
 export default function RestablecerContrasena() {
   const { t, i18n } = useTranslation();
+  
   useEffect(() => {
     const theme = localStorage.getItem('theme') || 'light';
     const lang = localStorage.getItem('vivesano_lang') || localStorage.getItem('i18nextLng') || 'es';
@@ -20,6 +21,9 @@ export default function RestablecerContrasena() {
       i18n.changeLanguage(lang);
     }
   }, [i18n]);
+
+  // Esta página puede necesitar permitir usuarios autenticados que quieren cambiar contraseña
+  // Por lo que no agregamos redirect automático como las otras páginas
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

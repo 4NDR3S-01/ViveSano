@@ -43,6 +43,32 @@ function validatePasswordField(password: string, t: any) {
   return "";
 }
 
+async function verifySessionAfterLogin(setLoading: any, setErrors: any) {
+  try {
+    const { data: sessionCheck, error: sessionError } = await supabase.auth.getSession();
+    console.log('Login - Verificación de sesión después del login:', {
+      hasSession: !!sessionCheck?.session,
+      hasUser: !!sessionCheck?.session?.user,
+      userEmail: sessionCheck?.session?.user?.email,
+      sessionError: sessionError
+    });
+
+    if (sessionCheck?.session) {
+      console.log('Login - Sesión confirmada, redirigiendo al dashboard...');
+      setLoading(false);
+      window.location.href = '/dashboard';
+    } else {
+      console.error('Login - Sesión no persistió correctamente');
+      setLoading(false);
+      setErrors({ email: "", password: "", general: "Error de sesión. Intenta de nuevo." });
+    }
+  } catch (error) {
+    console.error('Login - Error verificando sesión:', error);
+    setLoading(false);
+    setErrors({ email: "", password: "", general: "Error de sesión. Intenta de nuevo." });
+  }
+}
+
 async function submitLogin({
   email,
   password,
@@ -73,13 +99,29 @@ async function submitLogin({
   const newAttemptCount = attemptCount + 1;
   setAttemptCount(newAttemptCount);
   setAnnounceMessage(t('auth.loginAttempt', { count: newAttemptCount }));
+
+  console.log('Intentando login con:', email); // Debug
+
   try {
-    const { error: supabaseError } = await supabase.auth.signInWithPassword({
+    console.log('Login - Datos recibidos:', { email: email.trim() });
+
+    const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password: password.trim(),
     });
-    setLoading(false);
+
+    console.log('Login - Respuesta de Supabase:', {
+      hasData: !!data,
+      hasUser: !!data?.user,
+      hasSession: !!data?.session,
+      userEmail: data?.user?.email,
+      sessionId: data?.session?.access_token?.slice(0, 20) + '...',
+      error: supabaseError
+    });
+
     if (supabaseError) {
+      console.log('Login - Error de Supabase:', supabaseError);
+      setLoading(false);
       const errorMessage = getSupabaseErrorMessage(supabaseError, t);
       setErrors({ email: "", password: "", general: errorMessage });
       setAnnounceMessage(errorMessage);
@@ -91,13 +133,30 @@ async function submitLogin({
       if (submitButtonRef.current) {
         submitButtonRef.current.focus();
       }
-    } else {
+      return;
+    }
+
+    if (data?.session && data?.user) {
+      // Login exitoso con sesión válida
       setErrors({ email: "", password: "", general: "" });
       setAttemptCount(0);
       setAnnounceMessage("¡Inicio de sesión exitoso!");
-      const lang = localStorage.getItem('i18nextLng') || 'es';
-      window.location.href = `/dashboard?lng=${lang}`;
+
+      console.log('Login exitoso - sesión creada para:', data.user.email);
+
+      // Pequeña pausa para asegurar que las cookies se establezcan
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Verificar que la sesión esté realmente guardada
+      await verifySessionAfterLogin(setLoading, setErrors);
+      return;
     }
+
+    // Si no hay error pero tampoco sesión válida
+    console.error('Login aparentemente exitoso pero sin sesión válida');
+    setLoading(false);
+    setErrors({ email: "", password: "", general: "Error de autenticación. Intenta de nuevo." });
+
   } catch (unknownError) {
     setLoading(false);
     console.error('Login error:', unknownError);
@@ -299,6 +358,35 @@ export default function IniciarSesion() {
 
   // Hook para manejar el montaje del componente
   useEffect(() => setMounted(true), []);
+
+  // Verificación automática de sesión existente para usuarios ya logueados
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      if (!mounted || loading) return;
+      
+      console.log('Verificando sesión existente en página de login...');
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('Sesión existente en login:', { 
+          hasSession: !!session, 
+          hasUser: !!session?.user, 
+          userEmail: session?.user?.email 
+        });
+        
+        if (session?.user && !error) {
+          console.log('Usuario ya logueado, redirigiendo al dashboard...');
+          window.location.href = '/dashboard';
+        }
+      } catch (error) {
+        console.error('Error verificando sesión existente:', error);
+      }
+    };
+
+    if (mounted) {
+      const timeoutId = setTimeout(checkExistingSession, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [mounted, loading]);
 
   // Anunciar mensajes para lectores de pantalla
   useEffect(() => {

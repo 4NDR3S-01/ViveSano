@@ -6,7 +6,10 @@ import '../../i18n';
 
 export default function OlvidoContrasena() {
   const { t, i18n } = useTranslation();
+  const [mounted, setMounted] = useState(false);
+  
   useEffect(() => {
+    setMounted(true);
     const theme = localStorage.getItem('theme') || 'light';
     const lang = localStorage.getItem('vivesano_lang') || localStorage.getItem('i18nextLng') || 'es';
     const html = document.documentElement;
@@ -25,6 +28,35 @@ export default function OlvidoContrasena() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Verificación automática de sesión existente para usuarios ya logueados
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      if (!mounted || loading) return;
+      
+      console.log('Verificando sesión existente en página de olvido contraseña...');
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('Sesión existente en olvido contraseña:', { 
+          hasSession: !!session, 
+          hasUser: !!session?.user, 
+          userEmail: session?.user?.email 
+        });
+        
+        if (session?.user && !error) {
+          console.log('Usuario ya logueado, redirigiendo al dashboard...');
+          window.location.href = '/dashboard';
+        }
+      } catch (error) {
+        console.error('Error verificando sesión existente:', error);
+      }
+    };
+
+    if (mounted) {
+      const timeoutId = setTimeout(checkExistingSession, 300);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [mounted, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

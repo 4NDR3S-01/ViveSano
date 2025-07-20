@@ -262,6 +262,35 @@
   "dashboard": {
     "title": "Welcome to Dashboard",
     "stats": "Your statistics",
-    "welcome": "Hello! Start your journey to a healthier life"
+    "welcome": "Hello! Start your journey to a healthier life",
+    "nav": {
+      "overview": "Overview",
+      "habits": "Habits",
+      "challenges": "Challenges", 
+      "progress": "Progress",
+      "achievements": "Achievements",
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "sidebar": {
+      "toggle": "Toggle sidebar",
+      "collapse": "Collapse menu",
+      "expand": "Expand menu"
+    },
+    "overview": {
+      "title": "General Overview",
+      "subtitle": "Your progress today",
+      "habits_completed": "Habits completed",
+      "current_streak": "Current streak",
+      "total_points": "Total points",
+      "level": "Level"
+    },
+    "quick_actions": {
+      "title": "Quick actions",
+      "add_habit": "Add habit",
+      "log_activity": "Log activity",
+      "view_challenges": "View challenges"
+    }
   }
 }
