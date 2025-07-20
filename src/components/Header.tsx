@@ -172,6 +172,15 @@ export default function Header() {
       i18n.changeLanguage(savedLang);
     }
   }, [i18n]);
+
+  // Effect para forzar re-renderización cuando cambia el tema
+  useEffect(() => {
+    if (mounted && resolvedTheme) {
+      // Forzar re-renderización del header
+      setMenuOpen(prev => prev);
+    }
+  }, [resolvedTheme, mounted]);
+
   const currentTheme = theme === "system" ? resolvedTheme : theme;
 
   return (
@@ -208,18 +217,36 @@ export default function Header() {
               i18n.changeLanguage(e.target.value);
               localStorage.setItem('vivesano_lang', e.target.value);
             }}
-            className="rounded-md bg-card/80 border border-border px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+            className={`rounded-md border px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 ${
+              mounted && resolvedTheme === 'dark'
+                ? 'bg-gray-800 border-gray-600 text-gray-100'
+                : 'bg-white border-gray-300 text-gray-900'
+            }`}
             aria-label="Idioma"
           >
-            <option value="es">🇪🇸</option>
-            <option value="en">🇺🇸</option>
+            <option 
+              value="es"
+              className={mounted && resolvedTheme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}
+            >
+              🇪🇸
+            </option>
+            <option 
+              value="en"
+              className={mounted && resolvedTheme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'}
+            >
+              🇺🇸
+            </option>
           </select>
           {/* Cambio de tema */}
           {mounted && (
             <button
               aria-label={t('header.theme', { defaultValue: 'Cambiar tema' })}
               onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-              className="p-1.5 rounded-md bg-card/80 border border-border hover:bg-primary hover:text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+              className={`p-1.5 rounded-md border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                resolvedTheme === 'dark'
+                  ? 'bg-gray-800 border-gray-600 text-gray-100 hover:bg-purple-700 hover:border-purple-500'
+                  : 'bg-white border-gray-300 text-gray-900 hover:bg-purple-100 hover:border-purple-400'
+              }`}
             >
               {currentTheme === "dark" ? (
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>

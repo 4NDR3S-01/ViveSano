@@ -508,7 +508,7 @@ export default function Registrarse() {
     setError("");
     setSuccess("");
     setErrors({ name: "", email: "", password: "", confirmPassword: "", general: "" });
-
+    
     // Validar todos los campos
     const nameError = validateName(name);
     const emailError = validateEmail(email);

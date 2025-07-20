@@ -131,7 +131,7 @@ export default function IniciarSesion() {
 
     // Anunciar estado de validación para lectores de pantalla
     if (value.trim()) {
-      setAnnounceMessage(isValid ? t('auth.fieldValid') : emailError);
+      setAnnounceMessage(isValid ? t('auth.fieldValid', { defaultValue: 'Válido' }) : emailError);
     }
   };
 
@@ -152,7 +152,7 @@ export default function IniciarSesion() {
 
     // Anunciar estado de validación para lectores de pantalla
     if (value.trim()) {
-      setAnnounceMessage(isValid ? t('auth.fieldValid') : passwordError);
+      setAnnounceMessage(isValid ? t('auth.fieldValid', { defaultValue: 'Válido' }) : passwordError);
     }
   };
 
@@ -190,13 +190,17 @@ export default function IniciarSesion() {
         : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-purple-600 focus:ring-purple-600';
     }
     
-    return validation.isValid 
-      ? (isDark 
-          ? 'border-green-400 bg-green-900/20 text-gray-100 focus:border-green-300 focus:ring-green-400'
-          : 'border-green-500 bg-green-50 text-gray-900 focus:border-green-600 focus:ring-green-500')
-      : (isDark 
-          ? 'border-red-400 bg-red-900/20 text-gray-100 focus:border-red-300 focus:ring-red-400'
-          : 'border-red-500 bg-red-50 text-gray-900 focus:border-red-600 focus:ring-red-500');
+    let resultClass = '';
+    if (validation.isValid) {
+      resultClass = isDark
+        ? 'border-green-400 bg-green-900/20 text-gray-100 focus:border-green-300 focus:ring-green-400'
+        : 'border-green-500 bg-green-50 text-gray-900 focus:border-green-600 focus:ring-green-500';
+    } else {
+      resultClass = isDark
+        ? 'border-red-400 bg-red-900/20 text-gray-100 focus:border-red-300 focus:ring-red-400'
+        : 'border-red-500 bg-red-50 text-gray-900 focus:border-red-600 focus:ring-red-500';
+    }
+    return resultClass;
   };
 
   // Funciones auxiliares para el botón de envío
@@ -390,7 +394,7 @@ export default function IniciarSesion() {
               {fieldValidation.email.isValid && fieldValidation.email.isTouched && !errors.email && (
                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
                   <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
-                  <p id="email-success" aria-live="polite">{t('auth.fieldValid')}</p>
+                  <p id="email-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
                 </div>
               )}
             </div>
@@ -471,7 +475,7 @@ export default function IniciarSesion() {
               {fieldValidation.password.isValid && fieldValidation.password.isTouched && !errors.password && (
                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
                   <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
-                  <p id="password-success" aria-live="polite">{t('auth.fieldValid')}</p>
+                  <p id="password-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
                 </div>
               )}
             </div>
@@ -579,7 +583,15 @@ export default function IniciarSesion() {
             {/* Texto de ayuda para navegación */}
             <div className="text-center mt-3">
               <p id="button-help" className="text-xs text-gray-500 dark:text-gray-400">
-                💡 {t('auth.accessibilityInstructions')}
+                💡 {t('auth.accessibilityInstructions', { defaultValue: 'Instrucciones de accesibilidad: ' })}
+                </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t('auth.accessibilityInstructions1', { defaultValue: 'Usa Tab para navegar entre campos.' })}
+                <br />
+                {t('auth.accessibilityInstructions2', { defaultValue: 'Presiona Shift + Tab para retroceder.' })}
+                <br />
+                {t('auth.accessibilityInstructions3', { defaultValue: 'Presiona Enter para enviar el formulario.' })}
+                <br />
               </p>
             </div>
           </div>
