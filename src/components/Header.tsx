@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import BuscadorFAQ from "./BuscadorFAQ";
 
-function NavigationLinks({ getLinkClasses, isActiveLink, t }: { getLinkClasses: (href: string, baseClasses: string) => string, isActiveLink: (href: string) => boolean, t: any }) {
+function NavigationLinks({ getLinkClasses, isActiveLink, t }: Readonly<{ getLinkClasses: (href: string, baseClasses: string) => string, isActiveLink: (href: string) => boolean, t: any }>) {
   return (
     <>
       <a 
@@ -53,7 +53,7 @@ function NavigationLinks({ getLinkClasses, isActiveLink, t }: { getLinkClasses: 
   );
 }
 
-function MobileMenu({ menuOpen, setMenuOpen, getLinkClasses, isActiveLink, t }: { menuOpen: boolean, setMenuOpen: (open: boolean) => void, getLinkClasses: (href: string, baseClasses: string) => string, isActiveLink: (href: string) => boolean, t: any }) {
+function MobileMenu({ menuOpen, setMenuOpen, getLinkClasses, isActiveLink, t }: Readonly<{ menuOpen: boolean, setMenuOpen: (open: boolean) => void, getLinkClasses: (href: string, baseClasses: string) => string, isActiveLink: (href: string) => boolean, t: any }>) {
   if (!menuOpen) return null;
   return (
     <div className="fixed inset-0 z-40 flex items-start justify-end md:hidden">
