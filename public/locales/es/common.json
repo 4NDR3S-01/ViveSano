@@ -101,16 +101,37 @@
     "description": "Completa el formulario o utiliza los datos de contacto alternativos para comunicarte con nosotros.",
     "form": {
       "name": "Nombre",
-      "namePlaceholder": "Tu nombre",
+      "namePlaceholder": "Tu nombre completo",
+      "nameHelp": "Ingresa tu nombre y apellido para personalizar la respuesta",
       "email": "Correo electrónico",
       "emailPlaceholder": "tucorreo@ejemplo.com",
+      "emailHelp": "Asegúrate de usar un correo válido para recibir nuestra respuesta",
       "message": "Mensaje",
-      "messagePlaceholder": "Escribe tu mensaje aquí...",
-      "cta": "Enviar mensaje"
+      "messagePlaceholder": "Describe tu consulta, sugerencia o problema de forma detallada...",
+      "messageHelp": "Proporciona la mayor cantidad de detalles posible para ayudarte mejor",
+      "cta": "Enviar mensaje",
+      "sending": "Enviando mensaje...",
+      "success": "¡Mensaje enviado correctamente! Te responderemos a la brevedad.",
+      "successDetails": "Recibirás una respuesta en tu correo electrónico en un plazo máximo de 24 horas.",
+      "error": "Por favor, completa todos los campos obligatorios.",
+      "errorServer": "Error al enviar el mensaje. Por favor, inténtalo nuevamente o contacta directamente por correo.",
+      "errorEmail": "Por favor, ingresa un correo electrónico válido.",
+      "errorName": "El nombre debe tener al menos 2 caracteres.",
+      "errorMessage": "El mensaje debe tener al menos 10 caracteres.",
+      "formTitle": "Formulario de contacto",
+      "formDescription": "Completa los siguientes campos para enviarnos tu mensaje. Los campos marcados con asterisco son obligatorios.",
+      "requiredField": "campo obligatorio",
+      "fieldHasError": "Este campo contiene errores",
+      "submitAria": "Enviar formulario de contacto",
+      "loadingAria": "Enviando mensaje, por favor espera"
     },
     "alt": {
       "email": "Correo",
-      "phone": "Teléfono"
+      "phone": "Teléfono",
+      "title": "Otros medios de contacto",
+      "description": "También puedes contactarnos directamente a través de:",
+      "emailAria": "Enviar correo electrónico a contacto@vivesano.com",
+      "phoneAria": "Llamar al teléfono +34 600 123 456"
     }
   },
     "auth": {
@@ -118,11 +139,31 @@
     "email": "Correo electrónico",
     "password": "Contraseña",
     "login": "Entrar",
+    "loading": "Ingresando...",
     "register": "¿No tienes cuenta? Regístrate",
     "forgot": "¿Olvidaste tu contraseña?",
     "error": {
       "required": "Todos los campos son obligatorios.",
-      "invalid": "Credenciales incorrectas."
+      "invalid": "Credenciales incorrectas.",
+      "emailRequired": "El correo electrónico es obligatorio.",
+      "emailInvalid": "Por favor, ingresa un correo electrónico válido.",
+      "passwordRequired": "La contraseña es obligatoria.",
+      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
+      "passwordWeak": "La contraseña debe contener al menos una letra y un número.",
+      "invalidCredentials": "El correo o la contraseña son incorrectos.",
+      "userNotFound": "No existe una cuenta con este correo electrónico.",
+      "tooManyAttempts": "Demasiados intentos fallidos. Intenta nuevamente en unos minutos.",
+      "networkError": "Error de conexión. Verifica tu internet e intenta nuevamente.",
+      "blocked": "Demasiados intentos fallidos. Espera {time} segundos antes de intentar nuevamente.",
+      "unblocked": "Ya puedes intentar iniciar sesión nuevamente.",
+      "fieldValid": "Campo válido",
+      "fieldInvalid": "Campo inválido",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "loginAttempt": "Intento de inicio de sesión número {count}",
+      "accessibilityInstructions": "Usa Tab para navegar, Enter para enviar el formulario",
+      "emailHelp": "Ingresa un email válido, ej: usuario@email.com",
+      "passwordHelp": "Ingresa tu contraseña (mínimo 6 caracteres)"
     }
   }
   ,
@@ -139,7 +180,8 @@
       "required": "Todos los campos son obligatorios.",
       "passwordMatch": "Las contraseñas no coinciden.",
       "invalid": "No se pudo crear la cuenta."
-    }
+    },
+    "name": "Nombre completo"
   }
   ,
   "forgot": {

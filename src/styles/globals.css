@@ -1,26 +1,3 @@
-/* Input sólido adaptativo para modo claro/oscuro */
-.input-solid {
-  background: #fff;
-  color: #1e293b;
-  border: 2px solid var(--primary);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-primary);
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  width: 100%;
-  transition: background var(--transition), color var(--transition), border-color var(--transition);
-  outline: none;
-}
-.input-solid::placeholder {
-  color: #64748b;
-  opacity: 1;
-}
-.dark .input-solid {
-  background: #1e293b;
-  color: #f1f5f9;
-}
-.dark .input-solid::placeholder {
-  color: #a5b4fc;
-}
 @import 'tailwindcss';
 
 /* Configuración de fuentes */
@@ -274,7 +251,111 @@ header, footer, main {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Accesibilidad */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus visible mejorado para mejor navegación por teclado */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+/* Skip links para navegación por teclado */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  z-index: 1000;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Mejoras de contraste para estados de error */
+[aria-invalid="true"] {
+  border-color: #dc2626 !important;
+}
+
+[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 2px #dc2626;
+}
+
+/* Indicadores visuales para elementos requeridos */
+[aria-required="true"] + label::after,
+label[for] [aria-required="true"] + span::after {
+  content: " *";
+  color: #dc2626;
+}
+
 /* Responsive helpers */
 @media (max-width: 640px) {
   .card { padding: 1rem; }
+}
+
+/* Navegación activa - versión compacta */
+.nav-item-active {
+  background: linear-gradient(90deg, 
+    var(--primary) 0%, 
+    var(--secondary) 100%
+  );
+  color: var(--primary-foreground);
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
+  border: none;
+  transform: none;
+  position: relative;
+}
+
+.nav-item-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+/* Indicador de página actual - más sutil */
+.nav-item-active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary-foreground);
+  border-radius: 1px 1px 0 0;
+}
+
+@media (max-width: 768px) {
+  .nav-item-active::after {
+    bottom: auto;
+    top: 0;
+    left: -1px;
+    right: auto;
+    width: 3px;
+    height: 100%;
+    border-radius: 0 1px 1px 0;
+  }
 }

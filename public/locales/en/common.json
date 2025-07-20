@@ -101,16 +101,37 @@
     "description": "Fill out the form or use the alternative contact details to reach us.",
     "form": {
       "name": "Name",
-      "namePlaceholder": "Your name",
+      "namePlaceholder": "Your full name",
+      "nameHelp": "Enter your first and last name to personalize the response",
       "email": "Email",
       "emailPlaceholder": "youremail@example.com",
+      "emailHelp": "Make sure to use a valid email to receive our response",
       "message": "Message",
-      "messagePlaceholder": "Write your message here...",
-      "cta": "Send message"
+      "messagePlaceholder": "Describe your inquiry, suggestion, or issue in detail...",
+      "messageHelp": "Provide as much detail as possible so we can help you better",
+      "cta": "Send message",
+      "sending": "Sending message...",
+      "success": "Message sent successfully! We'll get back to you soon.",
+      "successDetails": "You'll receive a response to your email within 24 hours.",
+      "error": "Please fill in all required fields.",
+      "errorServer": "Error sending message. Please try again or contact us directly by email.",
+      "errorEmail": "Please enter a valid email address.",
+      "errorName": "Name must be at least 2 characters long.",
+      "errorMessage": "Message must be at least 10 characters long.",
+      "formTitle": "Contact form",
+      "formDescription": "Fill out the following fields to send us your message. Fields marked with an asterisk are required.",
+      "requiredField": "required field",
+      "fieldHasError": "This field contains errors",
+      "submitAria": "Submit contact form",
+      "loadingAria": "Sending message, please wait"
     },
     "alt": {
       "email": "Email",
-      "phone": "Phone"
+      "phone": "Phone",
+      "title": "Other contact methods",
+      "description": "You can also contact us directly through:",
+      "emailAria": "Send email to contacto@vivesano.com",
+      "phoneAria": "Call phone number +34 600 123 456"
     }
   },
     "auth": {
@@ -118,11 +139,31 @@
     "email": "Email",
     "password": "Password",
     "login": "Sign in",
+    "loading": "Signing in...",
     "register": "Don't have an account? Register",
     "forgot": "Forgot your password?",
     "error": {
       "required": "All fields are required.",
-      "invalid": "Incorrect credentials."
+      "invalid": "Incorrect credentials.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordTooShort": "Password must be at least 6 characters long.",
+      "passwordWeak": "Password must contain at least one letter and one number.",
+      "invalidCredentials": "Email or password is incorrect.",
+      "userNotFound": "No account exists with this email address.",
+      "tooManyAttempts": "Too many failed attempts. Try again in a few minutes.",
+      "networkError": "Network error. Check your internet connection and try again.",
+      "blocked": "Too many failed attempts. Wait {time} seconds before trying again.",
+      "unblocked": "You can now try to log in again.",
+      "fieldValid": "Valid field",
+      "fieldInvalid": "Invalid field",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password", 
+      "loginAttempt": "Login attempt number {count}",
+      "accessibilityInstructions": "Use Tab to navigate, Enter to submit the form",
+      "emailHelp": "Enter a valid email, e.g: user@email.com",
+      "passwordHelp": "Enter your password (minimum 6 characters)"
     }
   }
   ,
