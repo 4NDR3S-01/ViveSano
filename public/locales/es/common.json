@@ -261,8 +261,12 @@
   },
   "dashboard": {
     "title": "Bienvenido al Dashboard",
-    "stats": "Tus estadísticas", 
     "welcome": "¡Hola! Comienza tu viaje hacia una vida más saludable",
+    "today_habits": "Hábitos de hoy",
+    "weekly_progress": "Progreso semanal",
+    "no_habits": "No tienes hábitos configurados aún.",
+    "create_first_habit": "Crear tu primer hábito",
+    "loading_progress": "Cargando progreso...",
     "nav": {
       "main": "Principal",
       "account": "Cuenta", 
@@ -281,6 +285,18 @@
       "collapse": "Contraer menú",
       "expand": "Expandir menú"
     },
+    "stats": {
+      "title": "Tus estadísticas",
+      "current_streak": "Racha Actual",
+      "total_points": "Puntos Totales",
+      "habits_today": "Hábitos Hoy",
+      "active_challenges": "Desafíos Activos",
+      "days": "días"
+    },
+    "progress": {
+      "habits_completed": "Hábitos completados",
+      "active_challenges": "Desafíos activos"
+    },
     "overview": {
       "title": "Resumen General",
       "subtitle": "Tu progreso de hoy",
@@ -295,6 +311,95 @@
       "log_activity": "Registrar actividad",
       "view_challenges": "Ver retos"
     }
+  },
+  "habits": {
+    "title": "Mis Hábitos",
+    "subtitle": "Gestiona y realiza seguimiento de tus hábitos diarios",
+    "add_new": "Agregar Hábito",
+    "target": "Meta",
+    "today_progress": "Progreso hoy",
+    "completed_today": "Completado hoy",
+    "in_progress": "En progreso",
+    "pending": "Pendiente",
+    "create_first": "Crear mi primer hábito",
+    "empty": {
+      "title": "No tienes hábitos aún",
+      "description": "Comienza tu viaje hacia una vida más saludable creando tu primer hábito."
+    },
+    "create": {
+      "title": "Crear Nuevo Hábito",
+      "name": "Nombre del hábito",
+      "description": "Descripción",
+      "category": "Categoría",
+      "save": "Crear Hábito",
+      "cancel": "Cancelar"
+    }
+  },
+  "challenges": {
+    "title": "Desafíos",
+    "subtitle": "Participa en desafíos para mantener tu motivación",
+    "active_title": "Desafíos Activos",
+    "available_title": "Desafíos Disponibles",
+    "join": "Unirse al Desafío",
+    "empty_active": {
+      "title": "No tienes desafíos activos",
+      "description": "Únete a un desafío para comenzar tu aventura"
+    },
+    "example": {
+      "title": "7 Días de Meditación",
+      "description": "Medita durante 10 minutos al día por 7 días consecutivos",
+      "title2": "Hidratación Saludable",
+      "description2": "Bebe 8 vasos de agua al día durante 14 días",
+      "title3": "10,000 Pasos Diarios",
+      "description3": "Camina 10,000 pasos cada día durante 30 días"
+    }
+  },
+  "progress": {
+    "title": "Mi Progreso",
+    "subtitle": "Visualiza tu evolución y logros a lo largo del tiempo",
+    "overview": "Resumen General",
+    "charts": "Gráficos",
+    "weekly": "Esta Semana",
+    "monthly": "Este Mes",
+    "habits_streak": "Racha de Hábitos",
+    "completion_rate": "Tasa de Finalización",
+    "points_earned": "Puntos Ganados",
+    "active_days": "Días Activos"
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "subtitle": "Gestiona tu información personal y preferencias",
+    "personal_info": "Información Personal",
+    "email": "Correo electrónico",
+    "name": "Nombre",
+    "joined": "Se unió",
+    "stats": "Estadísticas del Perfil",
+    "edit": "Editar Perfil",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Personaliza tu experiencia en la aplicación",
+    "appearance": "Apariencia",
+    "theme": "Tema",
+    "theme_light": "Claro",
+    "theme_dark": "Oscuro",
+    "theme_system": "Sistema",
+    "language": "Idioma",
+    "language_es": "Español",
+    "language_en": "English",
+    "notifications": "Notificaciones",
+    "email_notifications": "Notificaciones por correo",
+    "push_notifications": "Notificaciones push",
+    "reminder_notifications": "Recordatorios de hábitos",
+    "account": "Cuenta",
+    "change_password": "Cambiar contraseña",
+    "delete_account": "Eliminar cuenta",
+    "danger_zone": "Zona de peligro",
+    "logout": "Cerrar sesión",
+    "save": "Guardar cambios",
+    "saved": "Cambios guardados"
   },
   "theme": {
     "toggle": "Cambiar tema",
