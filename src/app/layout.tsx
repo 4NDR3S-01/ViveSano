@@ -25,8 +25,8 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors fade-in`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors fade-in`}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <AppClientLayout>
             {children}
           </AppClientLayout>

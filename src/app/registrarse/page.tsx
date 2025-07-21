@@ -2,13 +2,13 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "next-themes";
 import { supabase } from "../../supabaseClient";
+import { useThemeForce } from "@/hooks/useThemeForce";
 import "../../i18n";
 
 export default function Registrarse() {
   const { t, i18n } = useTranslation();
-  const { resolvedTheme } = useTheme();
+  const { isDark } = useThemeForce();
   
   // Estados del formulario
   const [name, setName] = useState("");
@@ -222,7 +222,6 @@ export default function Registrarse() {
 
   // Componente de barra de fortaleza de contraseña
   const PasswordStrengthBar = () => {
-    const isDark = resolvedTheme === 'dark';
     const { score, feedback, criteria } = passwordStrength;
     
     const getStrengthColor = () => {
@@ -290,10 +289,10 @@ export default function Registrarse() {
         <div
           id="password-strength-feedback"
           className={`text-sm font-medium transition-colors duration-200 ${
-            score <= 2 ? 'text-red-600 dark:text-red-400' :
-            score <= 3 ? 'text-yellow-600 dark:text-yellow-400' :
-            score <= 4 ? 'text-blue-600 dark:text-blue-400' :
-            'text-green-600 dark:text-green-400'
+            score <= 2 ? (isDark ? 'text-red-400' : 'text-red-600') :
+            score <= 3 ? (isDark ? 'text-yellow-400' : 'text-yellow-600') :
+            score <= 4 ? (isDark ? 'text-blue-400' : 'text-blue-600') :
+            (isDark ? 'text-green-400' : 'text-green-600')
           }`}
           aria-live="polite"
         >
@@ -302,31 +301,31 @@ export default function Registrarse() {
 
         {/* Criterios de validación */}
         <div id="password-criteria" className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs">
-          <div className={`flex items-center gap-2 ${criteria.length ? 'text-green-600 dark:text-green-400' : isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className={`flex items-center gap-2 ${criteria.length ? (isDark ? 'text-green-400' : 'text-green-600') : (isDark ? 'text-gray-400' : 'text-gray-500')}`}>
             <span className="text-base" role="img" aria-hidden="true">
               {criteria.length ? '✓' : '○'}
             </span>
             <span>{t('auth.password_criteria.length', { defaultValue: 'Al menos 8 caracteres' })}</span>
           </div>
-          <div className={`flex items-center gap-2 ${criteria.uppercase ? 'text-green-600 dark:text-green-400' : isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className={`flex items-center gap-2 ${criteria.uppercase ? (isDark ? 'text-green-400' : 'text-green-600') : (isDark ? 'text-gray-400' : 'text-gray-500')}`}>
             <span className="text-base" role="img" aria-hidden="true">
               {criteria.uppercase ? '✓' : '○'}
             </span>
             <span>{t('auth.password_criteria.uppercase', { defaultValue: 'Letras mayúsculas' })}</span>
           </div>
-          <div className={`flex items-center gap-2 ${criteria.lowercase ? 'text-green-600 dark:text-green-400' : isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className={`flex items-center gap-2 ${criteria.lowercase ? (isDark ? 'text-green-400' : 'text-green-600') : (isDark ? 'text-gray-400' : 'text-gray-500')}`}>
             <span className="text-base" role="img" aria-hidden="true">
               {criteria.lowercase ? '✓' : '○'}
             </span>
             <span>{t('auth.password_criteria.lowercase', { defaultValue: 'Letras minúsculas' })}</span>
           </div>
-          <div className={`flex items-center gap-2 ${criteria.numbers ? 'text-green-600 dark:text-green-400' : isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className={`flex items-center gap-2 ${criteria.numbers ? (isDark ? 'text-green-400' : 'text-green-600') : (isDark ? 'text-gray-400' : 'text-gray-500')}`}>
             <span className="text-base" role="img" aria-hidden="true">
               {criteria.numbers ? '✓' : '○'}
             </span>
             <span>{t('auth.password_criteria.numbers', { defaultValue: 'Números' })}</span>
           </div>
-          <div className={`flex items-center gap-2 sm:col-span-2 ${criteria.special ? 'text-green-600 dark:text-green-400' : isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+          <div className={`flex items-center gap-2 sm:col-span-2 ${criteria.special ? (isDark ? 'text-green-400' : 'text-green-600') : (isDark ? 'text-gray-400' : 'text-gray-500')}`}>
             <span className="text-base" role="img" aria-hidden="true">
               {criteria.special ? '✓' : '○'}
             </span>
@@ -462,7 +461,6 @@ export default function Registrarse() {
     
     const validation = fieldValidation[field];
     const hasError = errors[field];
-    const isDark = resolvedTheme === 'dark';
     
     // Clases base
     const baseClasses = 'w-full py-4 text-lg rounded-2xl border-2 transition-all duration-200 shadow-lg focus:shadow-xl focus:outline-none';
@@ -510,11 +508,11 @@ export default function Registrarse() {
 
   // Effect para forzar re-renderización cuando cambia el tema
   useEffect(() => {
-    if (mounted && resolvedTheme) {
+    if (mounted) {
       // Forzar re-renderización de los inputs
       setFieldValidation(prev => ({ ...prev }));
     }
-  }, [resolvedTheme, mounted]);
+  }, [mounted]);
 
   // Effect para evaluar la fortaleza de la contraseña
   useEffect(() => {
@@ -658,7 +656,7 @@ export default function Registrarse() {
   };
 
   return (
-    <main className="min-h-[80vh] flex flex-col items-center justify-center bg-gradient-main px-4 py-12">
+    <main className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12">
       {/* Anuncio accesible para lectores de pantalla */}
       <div 
         aria-live="polite" 
@@ -669,19 +667,31 @@ export default function Registrarse() {
         {announceMessage}
       </div>
 
-      <section className="card w-full max-w-lg mx-auto text-center shadow-2xl animate-fade-in backdrop-blur-2xl bg-white/90 dark:bg-gray-900/90 border-2 border-primary/50 rounded-3xl p-12 transition-all duration-300 flex flex-col gap-8">
+      <section className={`w-full max-w-lg mx-auto text-center shadow-2xl animate-fade-in rounded-xl p-12 flex flex-col gap-8 border ${
+        isDark 
+          ? 'bg-slate-800 border-slate-700' 
+          : 'bg-white border-slate-200'
+      }`}>
         
         {/* Encabezado */}
         <header className="mb-4">
           <div className="flex items-center justify-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 dark:from-primary/30 dark:to-primary/20 rounded-full flex items-center justify-center shadow-lg">
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center shadow-lg ${
+              isDark 
+                ? 'bg-gradient-to-br from-violet-400/30 to-violet-400/20' 
+                : 'bg-gradient-to-br from-violet-600/20 to-violet-600/10'
+            }`}>
               <span className="text-3xl">👤</span>
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-8 tracking-tight drop-shadow-lg animate-fade-in">
+          <h1 className={`text-4xl md:text-5xl font-extrabold mb-8 tracking-tight drop-shadow-lg animate-fade-in ${
+            isDark ? 'text-violet-400' : 'text-violet-600'
+          }`}>
             {t('register.title', { defaultValue: 'Crear cuenta' })}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm">
+          <p className={`text-sm ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}>
             {t('register.subtitle', { defaultValue: 'Únete a ViveSano para comenzar tu viaje hacia una vida más saludable' })}
           </p>
         </header>
@@ -702,7 +712,11 @@ export default function Registrarse() {
           <div className="relative">
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20 rounded-xl flex items-center justify-center shadow-sm">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-blue-900/30 to-blue-800/20' 
+                    : 'bg-gradient-to-br from-blue-100 to-blue-50'
+                }`}>
                   <span className="text-lg">👤</span>
                 </div>
               </div>
@@ -735,7 +749,9 @@ export default function Registrarse() {
             {errors.name && (
               <div 
                 id="name-error" 
-                className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm animate-fade-in"
+                className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                  isDark ? 'text-red-400' : 'text-red-600'
+                }`}
                 role="alert"
                 aria-live="polite"
               >
@@ -746,7 +762,9 @@ export default function Registrarse() {
             
             {/* Indicador de validez */}
             {name && !errors.name && fieldValidation.name.touched && (
-              <div className="flex items-center gap-2 mt-2 text-green-600 dark:text-green-400 text-sm animate-fade-in">
+              <div className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                isDark ? 'text-green-400' : 'text-green-600'
+              }`}>
                 <span className="text-base" role="img" aria-label={t('auth.success_icon_label', { defaultValue: 'Válido' })}>✅</span>
                 <span>{t('auth.field_valid', { defaultValue: 'Campo válido' })}</span>
               </div>
@@ -757,7 +775,11 @@ export default function Registrarse() {
           <div className="relative">
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20 rounded-xl flex items-center justify-center shadow-sm">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-green-900/30 to-green-800/20' 
+                    : 'bg-gradient-to-br from-green-100 to-green-50'
+                }`}>
                   <span className="text-lg">📧</span>
                 </div>
               </div>
@@ -788,7 +810,9 @@ export default function Registrarse() {
             {errors.email && (
               <div 
                 id="email-error" 
-                className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm animate-fade-in"
+                className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                  isDark ? 'text-red-400' : 'text-red-600'
+                }`}
                 role="alert"
                 aria-live="polite"
               >
@@ -798,7 +822,9 @@ export default function Registrarse() {
             )}
             
             {email && !errors.email && fieldValidation.email.touched && (
-              <div className="flex items-center gap-2 mt-2 text-green-600 dark:text-green-400 text-sm animate-fade-in">
+              <div className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                isDark ? 'text-green-400' : 'text-green-600'
+              }`}>
                 <span className="text-base" role="img" aria-label={t('auth.success_icon_label', { defaultValue: 'Válido' })}>✅</span>
                 <span>{t('auth.field_valid', { defaultValue: 'Campo válido' })}</span>
               </div>
@@ -809,7 +835,11 @@ export default function Registrarse() {
           <div className="relative">
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-800/20 rounded-xl flex items-center justify-center shadow-sm">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-purple-900/30 to-purple-800/20' 
+                    : 'bg-gradient-to-br from-purple-100 to-purple-50'
+                }`}>
                   <span className="text-lg">🔐</span>
                 </div>
               </div>
@@ -835,7 +865,9 @@ export default function Registrarse() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                  isDark ? 'hover:bg-gray-600' : 'hover:bg-gray-100'
+                }`}
                 aria-label={showPassword 
                   ? t('auth.hide_password', { defaultValue: 'Ocultar contraseña' })
                   : t('auth.show_password', { defaultValue: 'Mostrar contraseña' })
@@ -858,7 +890,9 @@ export default function Registrarse() {
             {errors.password && (
               <div 
                 id="password-error" 
-                className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm animate-fade-in"
+                className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                  isDark ? 'text-red-400' : 'text-red-600'
+                }`}
                 role="alert"
                 aria-live="polite"
               >
@@ -872,7 +906,11 @@ export default function Registrarse() {
           <div className="relative">
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 rounded-xl flex items-center justify-center shadow-sm">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-orange-900/30 to-orange-800/20' 
+                    : 'bg-gradient-to-br from-orange-100 to-orange-50'
+                }`}>
                   <span className="text-lg">🔒</span>
                 </div>
               </div>
@@ -898,7 +936,9 @@ export default function Registrarse() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className={`absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                  isDark ? 'hover:bg-gray-600' : 'hover:bg-gray-100'
+                }`}
                 aria-label={showConfirmPassword 
                   ? t('auth.hide_password', { defaultValue: 'Ocultar contraseña' })
                   : t('auth.show_password', { defaultValue: 'Mostrar contraseña' })
@@ -918,7 +958,9 @@ export default function Registrarse() {
             {errors.confirmPassword && (
               <div 
                 id="confirm-password-error" 
-                className="flex items-center gap-2 mt-2 text-red-600 dark:text-red-400 text-sm animate-fade-in"
+                className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                  isDark ? 'text-red-400' : 'text-red-600'
+                }`}
                 role="alert"
                 aria-live="polite"
               >
@@ -928,7 +970,9 @@ export default function Registrarse() {
             )}
             
             {confirmPassword && !errors.confirmPassword && fieldValidation.confirmPassword.touched && (
-              <div className="flex items-center gap-2 mt-2 text-green-600 dark:text-green-400 text-sm animate-fade-in">
+              <div className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                isDark ? 'text-green-400' : 'text-green-600'
+              }`}>
                 <span className="text-base" role="img" aria-label={t('auth.success_icon_label', { defaultValue: 'Válido' })}>✅</span>
                 <span>{t('auth.passwords_match', { defaultValue: 'Las contraseñas coinciden' })}</span>
               </div>
@@ -939,7 +983,11 @@ export default function Registrarse() {
           <div className="space-y-3">
             {error && (
               <div 
-                className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-700 dark:text-red-300 animate-fade-in"
+                className={`flex items-center gap-3 p-4 rounded-xl animate-fade-in ${
+                  isDark 
+                    ? 'bg-red-900/20 border border-red-800 text-red-300' 
+                    : 'bg-red-50 border border-red-200 text-red-700'
+                }`}
                 role="alert"
                 aria-live="polite"
               >
@@ -950,7 +998,11 @@ export default function Registrarse() {
             
             {success && (
               <div 
-                className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl text-green-700 dark:text-green-300 animate-fade-in"
+                className={`flex items-center gap-3 p-4 rounded-xl animate-fade-in ${
+                  isDark 
+                    ? 'bg-green-900/20 border border-green-800 text-green-300' 
+                    : 'bg-green-50 border border-green-200 text-green-700'
+                }`}
                 role="alert"
                 aria-live="polite"
               >
@@ -962,7 +1014,11 @@ export default function Registrarse() {
             {/* Mensaje de bloqueo temporal */}
             {isBlocked && (
               <div 
-                className="flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl text-yellow-700 dark:text-yellow-300 animate-fade-in"
+                className={`flex items-center gap-3 p-4 rounded-xl animate-fade-in ${
+                  isDark 
+                    ? 'bg-yellow-900/20 border border-yellow-800 text-yellow-300' 
+                    : 'bg-yellow-50 border border-yellow-200 text-yellow-700'
+                }`}
                 role="alert"
                 aria-live="polite"
               >
@@ -984,10 +1040,10 @@ export default function Registrarse() {
               relative w-full py-4 px-6 rounded-2xl text-lg font-semibold transition-all duration-300 shadow-xl
               focus:outline-none focus:ring-4 focus:ring-purple-500/50 
               ${loading || isBlocked || (!name || !email || !password || !confirmPassword)
-                ? (mounted && resolvedTheme === 'dark' 
+                ? (isDark 
                     ? 'bg-gray-700 border border-gray-600 text-gray-400 cursor-not-allowed' 
                     : 'bg-gray-200 border border-gray-300 text-gray-500 cursor-not-allowed')
-                : (mounted && resolvedTheme === 'dark'
+                : (isDark
                     ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white border border-purple-500 hover:border-purple-400 shadow-lg hover:shadow-purple-500/30'
                     : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white border border-purple-600 hover:border-purple-500 shadow-lg hover:shadow-purple-500/30')
               }
@@ -1008,7 +1064,7 @@ export default function Registrarse() {
               {loading ? (
                 <>
                   <div className={`w-5 h-5 border-2 rounded-full animate-spin ${
-                    mounted && resolvedTheme === 'dark' 
+                    isDark 
                       ? 'border-purple-300/30 border-t-white' 
                       : 'border-white/30 border-t-white'
                   }`} 
@@ -1035,13 +1091,21 @@ export default function Registrarse() {
         </form>
 
         {/* Enlaces de navegación */}
-        <footer className="pt-6 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+        <footer className={`pt-6 border-t ${
+          isDark ? 'border-gray-700' : 'border-gray-200'
+        }`}>
+          <p className={`text-sm mb-4 ${
+            isDark ? 'text-gray-300' : 'text-gray-600'
+          }`}>
             {t('register.already_have_account', { defaultValue: '¿Ya tienes una cuenta?' })}
           </p>
           <Link 
             href="/iniciar-sesion" 
-            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 rounded-lg px-3 py-2"
+            className={`inline-flex items-center gap-2 font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:ring-offset-2 rounded-lg px-3 py-2 ${
+              isDark 
+                ? 'text-violet-400 hover:text-violet-300 focus:ring-offset-slate-800' 
+                : 'text-violet-600 hover:text-violet-700 focus:ring-offset-white'
+            }`}
             aria-label={t('auth.go_to_login', { defaultValue: 'Ir al inicio de sesión' })}
           >
             <span className="text-lg">🔑</span>

@@ -2,10 +2,12 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "../../supabaseClient";
+import { useThemeForce } from "@/hooks/useThemeForce";
 import '../../i18n';
 
 export default function OlvidoContrasena() {
   const { t, i18n } = useTranslation();
+  const { isDark } = useThemeForce();
   const [mounted, setMounted] = useState(false);
   
   useEffect(() => {
@@ -79,9 +81,15 @@ export default function OlvidoContrasena() {
   };
 
   return (
-    <main className="min-h-[80vh] flex flex-col items-center justify-center bg-gradient-main px-4 py-12">
-      <section className="card w-full max-w-lg mx-auto text-center shadow-2xl animate-fade-in backdrop-blur-2xl bg-white/90 dark:bg-gray-900/90 border-2 border-primary/50 rounded-3xl p-12 transition-all duration-300 flex flex-col gap-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-8 tracking-tight drop-shadow-lg animate-fade-in">
+    <main className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12">
+      <section className={`w-full max-w-lg mx-auto text-center shadow-2xl animate-fade-in rounded-xl p-12 flex flex-col gap-8 ${
+        isDark 
+          ? 'bg-slate-800 border border-slate-700' 
+          : 'bg-white border border-slate-200'
+      }`}>
+        <h1 className={`text-4xl md:text-5xl font-extrabold mb-8 tracking-tight drop-shadow-lg animate-fade-in ${
+          isDark ? 'text-violet-400' : 'text-violet-600'
+        }`}>
           {t('forgot.title', { defaultValue: 'Recuperar contraseña' })}
         </h1>
         <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
@@ -91,7 +99,11 @@ export default function OlvidoContrasena() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder={t('forgot.email', { defaultValue: 'Correo electrónico' })}
-              className="input-solid focus:ring-2 focus:ring-primary transition-all duration-200 pl-14 text-lg py-4 shadow-xl"
+              className={`w-full pl-14 py-4 text-lg rounded-xl border-2 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all duration-200 shadow-xl ${
+                isDark 
+                  ? 'border-slate-600 bg-slate-700 text-white' 
+                  : 'border-slate-200 bg-white text-slate-900'
+              }`}
               aria-label={t('forgot.email', { defaultValue: 'Correo electrónico' })}
               autoComplete="email"
             />
@@ -101,7 +113,7 @@ export default function OlvidoContrasena() {
           {success && <div className="text-green-600 font-semibold animate-fade-in">{success}</div>}
           <button
             type="submit"
-            className="btn bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold py-4 px-10 rounded-2xl shadow-xl hover:scale-105 hover:shadow-2xl transition-transform duration-200 disabled:opacity-60 border-2 border-primary text-lg"
+            className="bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold py-4 px-10 rounded-xl shadow-xl hover:scale-105 hover:shadow-2xl transition-transform duration-200 disabled:opacity-60 text-lg"
             disabled={loading}
           >
             {loading ? t('forgot.loading', { defaultValue: 'Enviando...' }) : t('forgot.cta', { defaultValue: 'Enviar correo' })}

@@ -13,27 +13,14 @@ module.exports = {
         mono: ["Geist Mono", "Menlo", "Monaco", "Consolas", "monospace"],
       },
       colors: {
-        background: "var(--background)",
-        card: "var(--card)",
-        foreground: "var(--foreground)",
-        'muted-foreground': "var(--muted-foreground)",
-        primary: "var(--primary)",
-        'primary-foreground': "var(--primary-foreground)",
-        secondary: "var(--secondary)",
-        'secondary-foreground': "var(--secondary-foreground)",
-        border: "var(--border)",
-        accent: "var(--accent)",
-        'accent-foreground': "var(--accent-foreground)",
+        primary: "#7c3aed",
+        'primary-foreground': "#ffffff",
+        secondary: "#f472b6",
+        'secondary-foreground': "#ffffff",
       },
       boxShadow: {
-        primary: "var(--shadow-primary)",
-        secondary: "var(--shadow-secondary)",
-      },
-      borderColor: {
-        strong: "var(--border-strong)",
-      },
-      backgroundImage: {
-        'gradient-main': 'var(--background)',
+        primary: "0 6px 32px 0 rgba(124,58,237,0.18), 0 1.5px 4px 0 rgba(124,58,237,0.10)",
+        secondary: "0 2px 8px 0 rgba(31,38,135,0.10)",
       },
       transitionProperty: {
         'colors': 'color, background-color, border-color',

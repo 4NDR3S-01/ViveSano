@@ -264,9 +264,12 @@
     "stats": "Tus estadísticas", 
     "welcome": "¡Hola! Comienza tu viaje hacia una vida más saludable",
     "nav": {
+      "main": "Principal",
+      "account": "Cuenta", 
+      "preferences": "Preferencias",
       "overview": "Resumen",
       "habits": "Hábitos",
-      "challenges": "Retos",
+      "challenges": "Desafíos",
       "progress": "Progreso",
       "achievements": "Logros",
       "profile": "Perfil",
@@ -292,5 +295,13 @@
       "log_activity": "Registrar actividad",
       "view_challenges": "Ver retos"
     }
+  },
+  "theme": {
+    "toggle": "Cambiar tema",
+    "dark": "Modo Oscuro",
+    "light": "Modo Claro"
+  },
+  "language": {
+    "toggle": "Cambiar idioma"
   }
 }

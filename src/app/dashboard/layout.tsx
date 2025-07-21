@@ -23,10 +23,19 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
       const lang = localStorage.getItem('vivesano_lang') || localStorage.getItem('i18nextLng') || 'es';
       const html = document.documentElement;
       
+      // Forzar el tema sin importar preferencias del sistema
+      html.classList.remove('dark', 'light');
+      
       if (theme === 'dark') {
         html.classList.add('dark');
+        html.style.colorScheme = 'dark';
+        document.body.style.backgroundColor = '#0f172a';
+        document.body.style.color = '#f1f5f9';
       } else {
-        html.classList.remove('dark');
+        html.classList.add('light');
+        html.style.colorScheme = 'light';
+        document.body.style.backgroundColor = '#ffffff';
+        document.body.style.color = '#1e293b';
       }
       
       html.setAttribute('lang', lang);
@@ -96,7 +105,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-primary text-xl font-bold animate-fade-in">
+          <p className="text-violet-600 text-xl font-bold animate-fade-in">
             {t('dashboard.loading', { defaultValue: 'Cargando...' })}
           </p>
         </div>
@@ -112,18 +121,18 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
   const isDark = resolvedTheme === 'dark';
 
   return (
-    <div className={`min-h-screen w-full flex ${isDark ? 'bg-gray-950' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen w-full flex ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
 
       {/* Contenido principal */}
-      <div className="flex-1 flex flex-col lg:ml-0">
+      <div className="flex-1 flex flex-col">
         {/* Header móvil */}
-        <header className={`lg:hidden sticky top-0 z-20 ${isDark ? 'bg-gray-900 border-b border-gray-700' : 'bg-white border-b border-gray-200'} shadow-sm`}>
+        <header className={`lg:hidden sticky top-0 z-20 ${isDark ? 'bg-slate-900 border-b border-slate-700' : 'bg-white border-b border-slate-200'} shadow-sm`}>
           <div className="flex items-center justify-between px-4 py-3">
             <button
               onClick={toggleSidebar}
-              className={`p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-gray-100 text-gray-600'}`}
+              className={`p-2 rounded-lg transition-colors ${isDark ? 'hover:bg-slate-700 text-slate-300' : 'hover:bg-slate-100 text-slate-600'}`}
               aria-label={t('dashboard.sidebar.toggle', { defaultValue: 'Alternar menú lateral' })}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +142,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
             
             <div className="flex items-center space-x-3">
               <span className="text-xl">🏥</span>
-              <h1 className="text-lg font-bold text-primary">ViveSano</h1>
+              <h1 className="text-lg font-bold text-violet-600">ViveSano</h1>
             </div>
 
             <div className="w-10"></div> {/* Spacer para centrar el título */}
@@ -141,7 +150,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
         </header>
 
         {/* Contenido de la página */}
-        <main className={`flex-1 overflow-hidden ${isDark ? 'bg-gray-950' : 'bg-gray-50'}`}>
+        <main className={`flex-1 overflow-hidden ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
           <div className="h-full overflow-y-auto">
             {children}
           </div>

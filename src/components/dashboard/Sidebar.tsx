@@ -13,22 +13,112 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const pathname = usePathname();
-  const { resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Forzar el theme correcto independientemente del sistema
+    const storedTheme = localStorage.getItem('theme') || 'light';
+    const html = document.documentElement;
+    
+    // Eliminar TODAS las clases de tema y forzar color-scheme a none
+    html.classList.remove('dark', 'light');
+    html.style.colorScheme = 'none';
+    document.body.style.colorScheme = 'none';
+    
+    // Aplicar el tema almacenado
+    if (storedTheme === 'dark') {
+      html.classList.add('dark');
+      document.body.style.backgroundColor = '#0f172a';
+      document.body.style.color = '#f1f5f9';
+    } else {
+      document.body.style.backgroundColor = '#ffffff';
+      document.body.style.color = '#1e293b';
+    }
+    
+    // Agregar regla CSS para anular sistema
+    let existingStyle = document.getElementById('force-theme-style');
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+    const style = document.createElement('style');
+    style.id = 'force-theme-style';
+    style.textContent = `*, *::before, *::after { color-scheme: none !important; }`;
+    document.head.appendChild(style);
   }, []);
 
+  // Cerrar menú de idioma cuando se hace click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showLanguageMenu) {
+        const target = event.target as Element;
+        if (!target.closest('.language-selector')) {
+          setShowLanguageMenu(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showLanguageMenu]);
+
   const isDark = mounted && resolvedTheme === 'dark';
+
+  // Función para cambiar el tema
+  const toggleTheme = () => {
+    const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+    const html = document.documentElement;
+    
+    // Cambiar con next-themes
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    
+    // Forzar cambios inmediatos eliminando influencia del OS
+    html.classList.remove('dark', 'light');
+    html.style.colorScheme = 'none';
+    document.body.style.colorScheme = 'none';
+    
+    if (newTheme === 'dark') {
+      html.classList.add('dark');
+      document.body.style.backgroundColor = '#0f172a';
+      document.body.style.color = '#f1f5f9';
+    } else {
+      document.body.style.backgroundColor = '#ffffff';
+      document.body.style.color = '#1e293b';
+    }
+
+    // Agregar regla CSS para anular sistema
+    let existingStyle = document.getElementById('force-theme-style');
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+    const style = document.createElement('style');
+    style.id = 'force-theme-style';
+    style.textContent = `*, *::before, *::after { color-scheme: none !important; }`;
+    document.head.appendChild(style);
+  };
+
+  // Función para cambiar idioma
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('vivesano_lang', lang);
+    localStorage.setItem('i18nextLng', lang);
+    document.documentElement.setAttribute('lang', lang);
+    setShowLanguageMenu(false);
+  };
 
   // Elementos de navegación del sidebar
   const navigationItems = [
     {
       key: 'overview',
-      label: t('dashboard.nav.overview'),
+      label: t('dashboard.nav.overview', { defaultValue: 'Resumen' }),
       href: '/dashboard',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
     },
     {
       key: 'habits',
-      label: t('dashboard.nav.habits'),
+      label: t('dashboard.nav.habits', { defaultValue: 'Hábitos' }),
       href: '/dashboard/habits',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +138,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
     },
     {
       key: 'challenges',
-      label: t('dashboard.nav.challenges'),
+      label: t('dashboard.nav.challenges', { defaultValue: 'Desafíos' }),
       href: '/dashboard/challenges',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
     },
     {
       key: 'progress',
-      label: t('dashboard.nav.progress'),
+      label: t('dashboard.nav.progress', { defaultValue: 'Progreso' }),
       href: '/dashboard/progress',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,22 +156,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
         </svg>
       ),
     },
-    {
-      key: 'achievements',
-      label: t('dashboard.nav.achievements'),
-      href: '/dashboard/achievements',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-        </svg>
-      ),
-    },
   ];
 
+  // Elementos de configuración
   const settingsItems = [
     {
       key: 'profile',
-      label: t('dashboard.nav.profile'),
+      label: t('dashboard.nav.profile', { defaultValue: 'Perfil' }),
       href: '/dashboard/profile',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,7 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
     },
     {
       key: 'settings',
-      label: t('dashboard.nav.settings'),
+      label: t('dashboard.nav.settings', { defaultValue: 'Configuración' }),
       href: '/dashboard/settings',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,8 +194,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
       }
       
       console.log('Sesión cerrada exitosamente, redirigiendo...');
-      // Limpiar cualquier dato local si es necesario
+      // Limpiar datos locales
       localStorage.removeItem('vivesano_lang');
+      localStorage.removeItem('i18nextLng');
       
       // Redirigir al login
       window.location.href = '/iniciar-sesion';
@@ -131,72 +213,56 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
   };
 
   const getLinkClasses = (href: string) => {
-    const baseClasses = "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group";
+    const baseClasses = "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group relative";
     const activeClasses = isDark 
-      ? "bg-primary/20 text-primary border-l-4 border-primary shadow-md" 
-      : "bg-primary/10 text-primary border-l-4 border-primary shadow-md";
+      ? "bg-violet-600/20 text-violet-400 border-l-4 border-violet-600 shadow-lg transform scale-105" 
+      : "bg-violet-600/10 text-violet-600 border-l-4 border-violet-600 shadow-lg transform scale-105";
     const inactiveClasses = isDark
-      ? "text-gray-300 hover:text-white hover:bg-gray-700/50"
-      : "text-gray-700 hover:text-gray-900 hover:bg-gray-100";
+      ? "text-slate-300 hover:text-white hover:bg-slate-800/50 hover:transform hover:scale-105"
+      : "text-slate-700 hover:text-slate-900 hover:bg-slate-100 hover:transform hover:scale-105";
     
     return `${baseClasses} ${isActiveLink(href) ? activeClasses : inactiveClasses}`;
   };
 
-  const sidebarClasses = `
-    fixed top-0 left-0 z-40 h-full w-64 transition-transform duration-300 ease-in-out
-    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-    lg:translate-x-0 lg:static lg:inset-0
-    ${isDark 
-      ? 'bg-gray-900 border-r border-gray-700' 
-      : 'bg-white border-r border-gray-200'
-    }
-    shadow-xl lg:shadow-none
-    ${className}
-  `;
-
   if (!mounted) {
-    return (
-      <div className={sidebarClasses}>
-        <div className="animate-pulse p-4">
-          <div className="h-8 bg-gray-200 rounded mb-4"></div>
-          <div className="space-y-3">
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return null; // Evitar hydration mismatch
   }
 
   return (
     <>
-      {/* Overlay para móvil */}
+      {/* Overlay para cerrar sidebar en móvil */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
           onClick={onToggle}
           aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
-      <aside className={sidebarClasses} aria-label="Navegación principal del dashboard">
+      <aside
+        className={`
+          fixed top-0 left-0 z-40 h-screen w-64 transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 lg:static lg:inset-0
+          ${isDark 
+            ? 'bg-slate-900 border-r border-slate-700' 
+            : 'bg-white border-r border-slate-200'
+          }
+          shadow-xl
+          ${className}
+        `}
+      >
         <div className="flex flex-col h-full">
           {/* Header del Sidebar */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className={`flex items-center justify-between p-4 ${isDark ? 'border-b border-slate-700' : 'border-b border-slate-200'}`}>
             <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">🏥</span>
+              <div className="flex items-center justify-center w-10 h-10 bg-violet-600 rounded-xl shadow-lg">
+                <span className="text-xl">🏥</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-lg font-bold text-primary truncate">
-                  ViveSano
-                </h1>
-                <p className="text-xs text-muted-foreground">
+              <div>
+                <h1 className="text-lg font-bold text-violet-600">ViveSano</h1>
+                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   Dashboard
                 </p>
               </div>
@@ -205,8 +271,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
             {/* Botón para cerrar sidebar en móvil */}
             <button
               onClick={onToggle}
-              className="lg:hidden p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label={t('dashboard.sidebar.toggle')}
+              className={`lg:hidden p-2 rounded-lg transition-colors ${
+                isDark ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-600'
+              }`}
+              aria-label={t('dashboard.sidebar.toggle', { defaultValue: 'Alternar menú' })}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -215,13 +283,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
           </div>
 
           {/* Navegación principal */}
-          <div className="flex-1 px-4 py-4 overflow-y-auto">
-            <nav className="space-y-2" aria-label="Navegación principal">
-              <div className="mb-6">
-                <h2 className="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-3">
-                  Principal
+          <div className="flex-1 px-4 py-6 overflow-y-auto sidebar-scroll">
+            <nav className="space-y-6" aria-label="Navegación principal">
+              {/* Navegación principal */}
+              <div>
+                <h2 className={`px-4 text-xs font-semibold uppercase tracking-wide mb-3 ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>
+                  {t('dashboard.nav.main', { defaultValue: 'Principal' })}
                 </h2>
-                <ul className="space-y-1">
+                <ul className="space-y-2">
                   {navigationItems.map((item) => (
                     <li key={item.key}>
                       <a
@@ -235,17 +306,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
                         <span className="flex-1 truncate">
                           {item.label}
                         </span>
+                        {isActiveLink(item.href) && (
+                          <span className="w-2 h-2 bg-violet-600 rounded-full animate-pulse" />
+                        )}
                       </a>
                     </li>
                   ))}
                 </ul>
               </div>
 
+              {/* Configuración */}
               <div>
-                <h2 className="px-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-3">
-                  Cuenta
+                <h2 className={`px-4 text-xs font-semibold uppercase tracking-wide mb-3 ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>
+                  {t('dashboard.nav.account', { defaultValue: 'Cuenta' })}
                 </h2>
-                <ul className="space-y-1">
+                <ul className="space-y-2">
                   {settingsItems.map((item) => (
                     <li key={item.key}>
                       <a
@@ -259,32 +336,166 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
                         <span className="flex-1 truncate">
                           {item.label}
                         </span>
+                        {isActiveLink(item.href) && (
+                          <span className="w-2 h-2 bg-violet-600 rounded-full animate-pulse" />
+                        )}
                       </a>
                     </li>
                   ))}
                 </ul>
               </div>
+
+              {/* Controles de tema e idioma */}
+              <div>
+                <h2 className={`px-4 text-xs font-semibold uppercase tracking-wide mb-3 ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>
+                  {t('dashboard.nav.preferences', { defaultValue: 'Preferencias' })}
+                </h2>
+                
+                {/* Toggle de tema */}
+                <div className="px-4 mb-3">
+                  <button
+                    onClick={toggleTheme}
+                    className={`
+                      w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200
+                      ${isDark 
+                        ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' 
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                      }
+                    `}
+                    aria-label={t('theme.toggle', { defaultValue: 'Cambiar tema' })}
+                  >
+                    <div className="flex items-center">
+                      {isDark ? (
+                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      )}
+                      <span className="text-sm font-medium">
+                        {isDark 
+                          ? t('theme.dark', { defaultValue: 'Modo Oscuro' })
+                          : t('theme.light', { defaultValue: 'Modo Claro' })
+                        }
+                      </span>
+                    </div>
+                    <div className={`
+                      w-12 h-6 rounded-full p-1 transition-colors duration-200 ease-in-out
+                      ${isDark ? 'bg-violet-600' : 'bg-slate-300'}
+                    `}>
+                      <div className={`
+                        w-4 h-4 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out
+                        ${isDark ? 'transform translate-x-6' : 'transform translate-x-0'}
+                      `} />
+                    </div>
+                  </button>
+                </div>
+
+                {/* Selector de idioma */}
+                <div className="px-4 relative language-selector">
+                  <button
+                    onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                    className={`
+                      w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200
+                      ${isDark 
+                        ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' 
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                      }
+                    `}
+                    aria-label={t('language.toggle', { defaultValue: 'Cambiar idioma' })}
+                  >
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                      </svg>
+                      <span className="text-sm font-medium">
+                        {i18n.language === 'es' ? 'Español' : 'English'}
+                      </span>
+                    </div>
+                    <svg className={`w-4 h-4 transition-transform duration-200 ${showLanguageMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Menú de idiomas */}
+                  {showLanguageMenu && (
+                    <div className={`
+                      absolute top-full left-4 right-4 mt-2 rounded-lg shadow-lg border z-50
+                      ${isDark 
+                        ? 'bg-slate-800 border-slate-700' 
+                        : 'bg-white border-slate-200'
+                      }
+                    `}>
+                      {(() => {
+                        let esButtonClass = '';
+                        if (i18n.language === 'es') {
+                          esButtonClass = isDark ? 'bg-violet-600/20 text-violet-400' : 'bg-violet-600/10 text-violet-600';
+                        } else {
+                          esButtonClass = isDark ? 'text-slate-300 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-100';
+                        }
+                        return (
+                          <button
+                            onClick={() => changeLanguage('es')}
+                            className={`
+                              w-full text-left px-4 py-3 text-sm transition-colors rounded-t-lg
+                              ${esButtonClass}
+                            `}
+                          >
+                            🇪🇸 Español
+                          </button>
+                        );
+                      })()}
+                      {(() => {
+                        let enButtonClass = '';
+                        if (i18n.language === 'en') {
+                          enButtonClass = isDark ? 'bg-violet-600/20 text-violet-400' : 'bg-violet-600/10 text-violet-600';
+                        } else {
+                          enButtonClass = isDark ? 'text-slate-300 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-100';
+                        }
+                        return (
+                          <button
+                            onClick={() => changeLanguage('en')}
+                            className={`
+                              w-full text-left px-4 py-3 text-sm transition-colors rounded-b-lg
+                              ${enButtonClass}
+                            `}
+                          >
+                            🇺🇸 English
+                          </button>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+              </div>
             </nav>
           </div>
 
-          {/* Footer del Sidebar */}
-          <div className="flex-shrink-0 p-4 border-t border-gray-200 dark:border-gray-700">
+          {/* Footer del Sidebar - Logout */}
+          <div className={`flex-shrink-0 p-4 border-t ${
+            isDark ? 'border-slate-700' : 'border-slate-200'
+          }`}>
             <button
               onClick={handleLogout}
               className={`
-                w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200
+                w-full flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg 
+                transition-all duration-200 transform hover:scale-105
                 ${isDark 
-                  ? 'text-red-400 hover:bg-red-900/20 hover:text-red-300' 
-                  : 'text-red-600 hover:bg-red-50 hover:text-red-700'
+                  ? 'text-red-400 hover:bg-red-900/20 hover:text-red-300 border border-red-400/20 hover:border-red-400/50' 
+                  : 'text-red-600 hover:bg-red-50 hover:text-red-700 border border-red-200 hover:border-red-300'
                 }
               `}
-              aria-label={t('dashboard.nav.logout')}
+              aria-label={t('dashboard.nav.logout', { defaultValue: 'Cerrar sesión' })}
             >
               <svg className="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              <span className="flex-1 text-left truncate">
-                {t('dashboard.nav.logout')}
+              <span className="truncate">
+                {t('dashboard.nav.logout', { defaultValue: 'Cerrar sesión' })}
               </span>
             </button>
           </div>

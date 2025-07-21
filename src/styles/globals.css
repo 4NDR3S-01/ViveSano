@@ -1,9 +1,16 @@
 @import 'tailwindcss';
 
-/* Configuración de fuentes */
+/* IMPORTANTE: Eliminar completamente la influencia del sistema operativo */
+
+/* Configuración base independiente del sistema */
+* {
+  color-scheme: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   font-family: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  color-scheme: none !important;
 }
 
 body {
@@ -11,6 +18,29 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: none !important;
+  background-color: #ffffff;
+  color: #1e293b;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Tema claro: aplicar solo cuando NO hay clase dark */
+html:not(.dark) body {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+}
+
+/* Tema oscuro: aplicar solo cuando HAY clase dark */
+html.dark body {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* Transiciones optimizadas - Solo para elementos que las necesitan */
+button, a, input, select, textarea, [role="button"] {
+  transition-property: color, background-color, border-color, transform, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Selección de texto mejorada */
@@ -24,19 +54,12 @@ body {
   color: #312e81;
 }
 
-/* Transiciones optimizadas */
-* {
-  transition-property: color, background-color, border-color, transform, box-shadow;
-  transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* Variables CSS mejoradas */
 :root {
-  color-scheme: light;
+  color-scheme: light !important;
   /* Fondo principal: gradiente más notorio y moderno */
   --background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 40%, #a5b4fc 80%, #fbc2eb 100%);
-  --card: rgba(255,255,255,0.92);
+  --card: #ffffff;
   --foreground: #1e293b;
   --muted-foreground: #64748b;
   --primary: #7c3aed;
@@ -44,7 +67,7 @@ body {
   --secondary: #f472b6;
   --secondary-foreground: #ffffff;
   --border: #e2e8f0;
-  --glass-bg: rgba(255,255,255,0.85);
+  --glass-bg: #ffffff;
   --shadow-primary: 0 6px 32px 0 rgba(124,58,237,0.18), 0 1.5px 4px 0 rgba(124,58,237,0.10);
   --shadow-secondary: 0 2px 8px 0 rgba(31,38,135,0.10);
   --border-strong: #a78bfa;
@@ -59,10 +82,10 @@ body {
 }
 
 .dark {
-  color-scheme: dark;
+  color-scheme: dark !important;
   --background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #312e81 80%, #a78bfa 100%);
-  --card: rgba(15,23,42,0.92);
-  --glass-bg: rgba(31,38,135,0.85);
+  --card: #0f172a;
+  --glass-bg: #1f2937;
   --foreground: #f1f5f9;
   --muted-foreground: #a5b4fc;
   --primary: #a78bfa;
@@ -74,62 +97,173 @@ body {
   --accent-foreground: #f1f5f9;
 }
 
-/* Utilidades para usar variables en Tailwind */
-.bg-background {
-  background: var(--background) !important;
+/* Sistema de colores independiente del OS - Solo basado en clases CSS */
+
+/* Colores base - MODO CLARO (cuando NO hay clase .dark) */
+html:not(.dark) .bg-white {
+  background-color: #ffffff !important;
 }
-.bg-card {
-  background: var(--card) !important;
+html:not(.dark) .bg-slate-800 {
+  background-color: #e2e8f0 !important; /* Más claro en modo claro */
 }
-.bg-accent {
-  background: var(--accent) !important;
+html:not(.dark) .bg-slate-900 {
+  background-color: #f1f5f9 !important; /* Muy claro en modo claro */
 }
+html:not(.dark) .text-white {
+  color: #1e293b !important; /* Oscuro en modo claro */
+}
+html:not(.dark) .text-slate-900 {
+  color: #1e293b !important;
+}
+html:not(.dark) .text-slate-600 {
+  color: #64748b !important;
+}
+html:not(.dark) .text-slate-500 {
+  color: #64748b !important;
+}
+html:not(.dark) .text-slate-400 {
+  color: #94a3b8 !important;
+}
+html:not(.dark) .text-slate-300 {
+  color: #cbd5e1 !important;
+}
+html:not(.dark) .text-violet-600 {
+  color: #7c3aed !important;
+}
+html:not(.dark) .text-violet-400 {
+  color: #7c3aed !important; /* Mismo color en modo claro */
+}
+html:not(.dark) .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+html:not(.dark) .border-slate-700 {
+  border-color: #cbd5e1 !important; /* Más claro en modo claro */
+}
+
+/* Colores base - MODO OSCURO (cuando hay clase .dark) */
+html.dark .bg-white {
+  background-color: #1e293b !important; /* Oscuro en modo oscuro */
+}
+html.dark .bg-slate-800 {
+  background-color: #1e293b !important;
+}
+html.dark .bg-slate-900 {
+  background-color: #0f172a !important;
+}
+html.dark .text-white {
+  color: #ffffff !important;
+}
+html.dark .text-slate-900 {
+  color: #f1f5f9 !important; /* Claro en modo oscuro */
+}
+html.dark .text-slate-600 {
+  color: #94a3b8 !important; /* Más claro en modo oscuro */
+}
+html.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+html.dark .text-slate-300 {
+  color: #cbd5e1 !important;
+}
+html.dark .text-violet-600 {
+  color: #a78bfa !important; /* Más claro en modo oscuro */
+}
+html.dark .text-violet-400 {
+  color: #a78bfa !important;
+}
+html.dark .border-slate-200 {
+  border-color: #374151 !important; /* Más oscuro en modo oscuro */
+}
+html.dark .border-slate-700 {
+  border-color: #374151 !important;
+}
+
+/* SVG y elementos especiales */
+html:not(.dark) .text-white svg {
+  color: #ffffff !important;
+}
+html.dark .text-white svg {
+  color: #ffffff !important;
+}
+
+/* Gradientes - Independientes del sistema */
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--tw-gradient-stops)) !important;
+}
+.from-violet-600 {
+  --tw-gradient-from: #7c3aed !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent) !important;
+}
+.to-pink-500 {
+  --tw-gradient-to: #ec4899 !important;
+}
+
+/* Utilidades principales - Independientes del sistema */
+.text-primary {
+  color: #7c3aed !important;
+}
+html.dark .text-primary {
+  color: #a78bfa !important;
+}
+
+.text-secondary {
+  color: #f472b6 !important;
+}
+
+.bg-primary {
+  background-color: #7c3aed !important;
+}
+
+.bg-secondary {
+  background-color: #f472b6 !important;
+}
+
+.border-primary {
+  border-color: #7c3aed !important;
+}
+
 .text-foreground {
-  color: var(--foreground) !important;
+  color: #1e293b !important;
 }
+html.dark .text-foreground {
+  color: #f1f5f9 !important;
+}
+
 .text-muted-foreground {
-  color: var(--muted-foreground) !important;
+  color: #64748b !important;
 }
-.text-accent-foreground {
-  color: var(--accent-foreground) !important;
+html.dark .text-muted-foreground {
+  color: #a5b4fc !important;
 }
-.border-border {
-  border-color: var(--border) !important;
-}
-.border-strong {
-  border-color: var(--border-strong) !important;
-}
+
 .shadow-primary {
-  box-shadow: var(--shadow-primary) !important;
+  box-shadow: 0 6px 32px 0 rgba(124,58,237,0.18), 0 1.5px 4px 0 rgba(124,58,237,0.10) !important;
 }
 .shadow-secondary {
-  box-shadow: var(--shadow-secondary) !important;
+  box-shadow: 0 2px 8px 0 rgba(31,38,135,0.10) !important;
 }
 
-/* Gradientes mejorados */
-.gradient-primary {
-  background: linear-gradient(90deg, #7c3aed 0%, #f472b6 100%);
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
-}
-.gradient-secondary {
-  background: linear-gradient(90deg, #a5b4fc 0%, #fbc2eb 100%);
-  color: transparent;
-  background-clip: text;
-  -webkit-background-clip: text;
-}
-
-/* Efecto glass mejorado */
+/* Efecto glass - Independiente del sistema */
 .glass {
-  background: var(--glass-bg) !important;
   backdrop-filter: blur(24px) saturate(200%);
   -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1.5px solid var(--border-strong);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
-/* Animaciones personalizadas */
+html:not(.dark) .glass {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1.5px solid #a78bfa !important;
+}
+
+html.dark .glass {
+  background: rgba(31, 41, 55, 0.9) !important;
+  border: 1.5px solid #a78bfa !important;
+}
+
+/* Animaciones personalizadas - Independientes del sistema */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
@@ -145,6 +279,11 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
@@ -155,6 +294,14 @@ body {
 
 .animate-slide-up {
   animation: slide-up 0.6s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Mejoras de accesibilidad */
@@ -168,103 +315,40 @@ body {
 
 /* Focus visible mejorado */
 .focus-visible:focus {
-  outline: 2px solid var(--primary);
+  outline: 2px solid #7c3aed;
   outline-offset: 2px;
 }
 
-/* Scrollbar personalizada */
+/* Scrollbar personalizada - Independiente del sistema */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--accent);
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--primary);
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #7c3aed;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--border-strong);
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #a78bfa;
 }
 
-/* Transiciones específicas para el cambio de tema */
-html,
-html.dark {
-  transition: none;
+html.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
 }
 
-/* Evitar transiciones problemáticas en elementos críticos */
-header, footer, main {
-  transition: none;
+html.dark ::-webkit-scrollbar-thumb {
+  background: #a78bfa;
+  border-radius: 4px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.dark) {
-    color-scheme: dark;
-  }
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
 }
-
-/* Glassmorphism y tarjetas */
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-primary);
-  padding: 2rem;
-  transition: box-shadow var(--transition), transform var(--transition);
-}
-.card:hover {
-  box-shadow: 0 12px 48px 0 rgba(124,58,237,0.22);
-  transform: translateY(-2px) scale(1.02);
-}
-
-/* Botones modernos */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  border-radius: var(--radius);
-  padding: 0.6em 1.4em;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  box-shadow: var(--shadow-primary);
-  border: none;
-  cursor: pointer;
-  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
-}
-.btn:hover, .btn:focus-visible {
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
-  box-shadow: 0 8px 32px 0 rgba(124,58,237,0.22);
-  outline: var(--focus-ring);
-  transform: scale(1.04);
-}
-
-/* Animaciones sutiles */
-.fade-in {
-  animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Accesibilidad */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Focus visible mejorado para mejor navegación por teclado */
 *:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
@@ -332,7 +416,7 @@ label[for] [aria-required="true"] + span::after {
   right: 0;
   bottom: 0;
   border-radius: inherit;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--accent);
   pointer-events: none;
 }
 
@@ -357,5 +441,79 @@ label[for] [aria-required="true"] + span::after {
     width: 3px;
     height: 100%;
     border-radius: 0 1px 1px 0;
+  }
+}
+
+/* =================================
+   SCROLLBAR PERSONALIZADA - SIDEBAR
+   ================================= */
+
+/* Scrollbar para el sidebar - Compatible con todos los navegadores */
+.sidebar-scroll {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #64748b transparent;
+}
+
+/* Tema claro */
+html:not(.dark) .sidebar-scroll {
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+html:not(.dark) .sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+html:not(.dark) .sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html:not(.dark) .sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+html:not(.dark) .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Tema oscuro */
+html.dark .sidebar-scroll {
+  scrollbar-color: #64748b transparent;
+}
+
+html.dark .sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+html.dark .sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html.dark .sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #64748b;
+  border-radius: 3px;
+}
+
+html.dark .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Scrollbar más visible en móvil */
+@media (max-width: 1024px) {
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 8px !important;
+  }
+  
+  .sidebar-scroll {
+    scrollbar-width: auto;
+  }
+  
+  html:not(.dark) .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: #94a3b8 !important;
+  }
+  
+  html.dark .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: #475569 !important;
   }
 }

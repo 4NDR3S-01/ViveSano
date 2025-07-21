@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "next-themes";
+import { useThemeForce } from "@/hooks/useThemeForce";
 import '../../i18n';
 
 // Datos mock para el dashboard
@@ -13,7 +13,7 @@ const getDashboardStats = (t: any, isDark: boolean) => [
     total: "12",
     icon: "✅",
     color: "text-green-600",
-    bg: isDark ? "bg-green-900/20" : "bg-green-50",
+    bg: isDark ? "bg-green-900" : "bg-green-50",
     border: isDark ? "border-green-700" : "border-green-200",
   },
   {
@@ -23,7 +23,7 @@ const getDashboardStats = (t: any, isDark: boolean) => [
     unit: "días",
     icon: "🔥",
     color: "text-orange-600",
-    bg: isDark ? "bg-orange-900/20" : "bg-orange-50",
+    bg: isDark ? "bg-orange-900" : "bg-orange-50",
     border: isDark ? "border-orange-700" : "border-orange-200",
   },
   {
@@ -32,7 +32,7 @@ const getDashboardStats = (t: any, isDark: boolean) => [
     value: "1,250",
     icon: "⭐",
     color: "text-purple-600",
-    bg: isDark ? "bg-purple-900/20" : "bg-purple-50",
+    bg: isDark ? "bg-purple-900" : "bg-purple-50",
     border: isDark ? "border-purple-700" : "border-purple-200",
   },
   {
@@ -41,7 +41,7 @@ const getDashboardStats = (t: any, isDark: boolean) => [
     value: "7",
     icon: "🏆",
     color: "text-blue-600",
-    bg: isDark ? "bg-blue-900/20" : "bg-blue-50",
+    bg: isDark ? "bg-blue-900" : "bg-blue-50",
     border: isDark ? "border-blue-700" : "border-blue-200",
   },
 ];
@@ -52,7 +52,7 @@ const getQuickActions = (t: any, isDark: boolean) => [
     title: t('dashboard.quick_actions.add_habit'),
     icon: "➕",
     color: "text-green-600",
-    bg: isDark ? "bg-green-900/20" : "bg-green-50",
+    bg: isDark ? "bg-green-900" : "bg-green-50",
     border: isDark ? "border-green-700" : "border-green-200",
     href: "/dashboard/habits/new"
   },
@@ -61,7 +61,7 @@ const getQuickActions = (t: any, isDark: boolean) => [
     title: t('dashboard.quick_actions.log_activity'),
     icon: "📝",
     color: "text-blue-600",
-    bg: isDark ? "bg-blue-900/20" : "bg-blue-50",
+    bg: isDark ? "bg-blue-900" : "bg-blue-50",
     border: isDark ? "border-blue-700" : "border-blue-200",
     href: "/dashboard/activities/log"
   },
@@ -70,7 +70,7 @@ const getQuickActions = (t: any, isDark: boolean) => [
     title: t('dashboard.quick_actions.view_challenges'),
     icon: "🎯",
     color: "text-purple-600",
-    bg: isDark ? "bg-purple-900/20" : "bg-purple-50",
+    bg: isDark ? "bg-purple-900" : "bg-purple-50",
     border: isDark ? "border-purple-700" : "border-purple-200",
     href: "/dashboard/challenges"
   },
@@ -85,7 +85,7 @@ const getTodayHabits = () => [
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
-  const { resolvedTheme } = useTheme();
+  const { isDark } = useThemeForce();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -94,10 +94,19 @@ export default function Dashboard() {
     const lang = localStorage.getItem('vivesano_lang') || localStorage.getItem('i18nextLng') || 'es';
     const html = document.documentElement;
     
+    // Forzar tema sin interferencia del sistema
+    html.classList.remove('dark', 'light');
+    
     if (theme === 'dark') {
       html.classList.add('dark');
+      html.style.colorScheme = 'dark';
+      document.body.style.backgroundColor = '#0f172a';
+      document.body.style.color = '#f1f5f9';
     } else {
-      html.classList.remove('dark');
+      html.classList.add('light');
+      html.style.colorScheme = 'light';
+      document.body.style.backgroundColor = '#ffffff';
+      document.body.style.color = '#1e293b';
     }
     
     html.setAttribute('lang', lang);
@@ -111,16 +120,15 @@ export default function Dashboard() {
     return <LoadingSkeleton />;
   }
 
-  const isDark = resolvedTheme === 'dark';
   const stats = getDashboardStats(t, isDark);
   const quickActions = getQuickActions(t, isDark);
   const todayHabits = getTodayHabits();
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <DashboardHeader t={t} />
-      <StatsGrid stats={stats} />
-      <QuickActionsSection t={t} actions={quickActions} />
+      <DashboardHeader t={t} isDark={isDark} />
+      <StatsGrid stats={stats} isDark={isDark} />
+      <QuickActionsSection t={t} actions={quickActions} isDark={isDark} />
       <RecentProgressSection isDark={isDark} habits={todayHabits} />
     </div>
   );
@@ -130,40 +138,37 @@ export default function Dashboard() {
 const LoadingSkeleton = () => (
   <div className="p-6">
     <div className="animate-pulse">
-      <div className="h-8 bg-gray-200 rounded mb-4 w-1/2"></div>
+      <div className="h-8 bg-slate-200 rounded mb-4 w-1/2"></div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gray-200 rounded-lg h-24"></div>
-        <div className="bg-gray-200 rounded-lg h-24"></div>
-        <div className="bg-gray-200 rounded-lg h-24"></div>
-        <div className="bg-gray-200 rounded-lg h-24"></div>
+        <div className="bg-slate-200 rounded-lg h-24"></div>
+        <div className="bg-slate-200 rounded-lg h-24"></div>
+        <div className="bg-slate-200 rounded-lg h-24"></div>
+        <div className="bg-slate-200 rounded-lg h-24"></div>
       </div>
     </div>
   </div>
 );
 
 // Componente del header
-const DashboardHeader = ({ t }: { t: any }) => (
+const DashboardHeader = ({ t, isDark }: { t: any; isDark: boolean }) => (
   <div className="mb-8">
-    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-      {t('dashboard.overview.title')}
+    <h1 className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+      {t('dashboard.welcome')}
     </h1>
-    <p className="text-gray-600 dark:text-gray-400">
-      {t('dashboard.overview.subtitle')}
-    </p>
   </div>
 );
 
 // Componente de estadísticas
-const StatsGrid = ({ stats }: { stats: any[] }) => (
+const StatsGrid = ({ stats, isDark }: { stats: any[]; isDark: boolean }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     {stats.map((stat) => (
-      <StatCard key={stat.id} stat={stat} />
+      <StatCard key={stat.id} stat={stat} isDark={isDark} />
     ))}
   </div>
 );
 
 // Componente para tarjeta de estadística individual
-const StatCard = ({ stat }: { stat: any }) => (
+const StatCard = ({ stat, isDark }: { stat: any; isDark: boolean }) => (
   <div
     className={`
       ${stat.bg} ${stat.border} border rounded-xl p-6 
@@ -174,20 +179,20 @@ const StatCard = ({ stat }: { stat: any }) => (
       <span className="text-2xl">{stat.icon}</span>
       <div className={`text-2xl font-bold ${stat.color}`}>
         {stat.value}
-        {stat.total && <span className="text-sm text-gray-500 dark:text-gray-400">/{stat.total}</span>}
-        {stat.unit && <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">{stat.unit}</span>}
+        {stat.total && <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>/{stat.total}</span>}
+        {stat.unit && <span className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'} ml-1`}>{stat.unit}</span>}
       </div>
     </div>
-    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+    <h3 className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
       {stat.title}
     </h3>
   </div>
 );
 
 // Componente de acciones rápidas
-const QuickActionsSection = ({ t, actions }: { t: any; actions: any[] }) => (
+const QuickActionsSection = ({ t, actions, isDark }: { t: any; actions: any[]; isDark: boolean }) => (
   <div className="mb-8">
-    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+    <h2 className={`text-xl font-semibold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
       {t('dashboard.quick_actions.title')}
     </h2>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -228,10 +233,10 @@ const RecentProgressSection = ({ isDark, habits }: { isDark: boolean; habits: an
 // Componente de hábitos
 const HabitsCard = ({ isDark, habits }: { isDark: boolean; habits: any[] }) => (
   <div className={`
-    ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} 
+    ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} 
     border rounded-xl p-6 shadow-sm
   `}>
-    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
       Hábitos de hoy
     </h3>
     <div className="space-y-3">
@@ -245,10 +250,10 @@ const HabitsCard = ({ isDark, habits }: { isDark: boolean; habits: any[] }) => (
 // Componente de progreso semanal
 const WeeklyProgressCard = ({ isDark }: { isDark: boolean }) => (
   <div className={`
-    ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} 
+    ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'} 
     border rounded-xl p-6 shadow-sm
   `}>
-    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-slate-900'}`}>
       Progreso semanal
     </h3>
     <div className="space-y-4">
@@ -279,11 +284,11 @@ const ProgressBar = ({ label, percentage, width, color, isDark }: {
   isDark: boolean;
 }) => (
   <div>
-    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+    <div className={`flex justify-between text-sm mb-1 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
       <span>{label}</span>
       <span>{percentage}</span>
     </div>
-    <div className={`w-full ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-full h-2`}>
+    <div className={`w-full ${isDark ? 'bg-slate-700' : 'bg-slate-200'} rounded-full h-2`}>
       <div className={`${color} h-2 rounded-full`} style={{ width }}></div>
     </div>
   </div>
@@ -293,7 +298,7 @@ const ProgressBar = ({ label, percentage, width, color, isDark }: {
 const HabitItem = ({ habit, isDark }: { habit: any; isDark: boolean }) => {
   const getCheckboxClasses = () => {
     if (habit.completed) return 'bg-green-500 border-green-500';
-    return isDark ? 'border-gray-600' : 'border-gray-300';
+    return isDark ? 'border-slate-600' : 'border-slate-300';
   };
 
   return (
@@ -309,9 +314,21 @@ const HabitItem = ({ habit, isDark }: { habit: any; isDark: boolean }) => {
         )}
       </div>
       <span className="text-xl">{habit.icon}</span>
-      <span className={`flex-1 ${habit.completed ? 'line-through text-gray-500' : 'text-gray-700 dark:text-gray-300'}`}>
-        {habit.name}
-      </span>
+      {(() => {
+        let textClass = '';
+        if (habit.completed) {
+          textClass = 'line-through text-slate-500';
+        } else if (isDark) {
+          textClass = 'text-slate-300';
+        } else {
+          textClass = 'text-slate-700';
+        }
+        return (
+          <span className={`flex-1 ${textClass}`}>
+            {habit.name}
+          </span>
+        );
+      })()}
     </div>
   );
 };

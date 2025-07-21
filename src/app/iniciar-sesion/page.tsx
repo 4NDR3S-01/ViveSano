@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "next-themes";
 import { supabase } from "../../supabaseClient";
+import { useThemeForce } from "@/hooks/useThemeForce";
 import '../../i18n';
 
 // Helper functions extracted outside the component to reduce complexity
@@ -181,6 +181,7 @@ function EmailField({
   errors,
   fieldValidation,
   getValidationClasses,
+  isDark,
 }: any) {
   return (
     <div className="space-y-2">
@@ -197,7 +198,11 @@ function EmailField({
             if (error) setAnnounceMessage(error);
           }}
           placeholder={t('auth.email', { defaultValue: 'Correo electrónico' })}
-          className={`w-full pl-12 pr-12 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none ${getValidationClasses('email')}`}
+          className={`w-full pl-12 pr-12 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 ${
+            isDark 
+              ? 'bg-slate-700 text-white border-slate-600' 
+              : 'bg-white text-slate-900 border-slate-200'
+          }`}
           aria-label={t('auth.email', { defaultValue: 'Correo electrónico' })}
           aria-invalid={!!errors.email}
           aria-describedby={`email-help ${errors.email ? "email-error" : ""} ${fieldValidation.email.isValid && fieldValidation.email.isTouched ? "email-success" : ""}`.trim()}
@@ -205,13 +210,17 @@ function EmailField({
           required
         />
         <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-          <span className="text-xl text-gray-500 dark:text-gray-400" aria-hidden="true">📧</span>
+          <span className={`text-xl ${
+            isDark ? 'text-slate-400' : 'text-slate-500'
+          }`} aria-hidden="true">📧</span>
         </div>
         {fieldValidation.email.isTouched && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
             <span
               className={`text-lg font-bold ${
-                fieldValidation.email.isValid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                fieldValidation.email.isValid 
+                  ? (isDark ? 'text-green-400' : 'text-green-600')
+                  : (isDark ? 'text-red-400' : 'text-red-600')
               }`}
               aria-hidden="true"
             >
@@ -221,19 +230,29 @@ function EmailField({
         )}
       </div>
       <div className="px-2">
-        <p id="email-help" className="text-xs text-gray-500 dark:text-gray-400">
+        <p id="email-help" className={`text-xs ${
+          isDark ? 'text-gray-400' : 'text-gray-500'
+        }`}>
           💡 {t('auth.emailHelp', { defaultValue: 'Ingresa un email válido, ej: usuario@email.com' })}
         </p>
       </div>
       <div className="px-2">
         {errors.email && (
-          <div className="flex items-start gap-2 text-red-600 dark:text-red-400 text-sm animate-pulse bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-800">
+          <div className={`flex items-start gap-2 text-sm animate-pulse p-2 rounded-lg border ${
+            isDark 
+              ? 'text-red-400 bg-red-900/20 border-red-800' 
+              : 'text-red-600 bg-red-50 border-red-200'
+          }`}>
             <span className="text-base mt-0.5 flex-shrink-0" aria-label="Error">⚠️</span>
             <p id="email-error" role="alert" aria-live="polite">{errors.email}</p>
           </div>
         )}
         {fieldValidation.email.isValid && fieldValidation.email.isTouched && !errors.email && (
-          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
+          <div className={`flex items-center gap-2 text-sm p-2 rounded-lg border ${
+            isDark 
+              ? 'text-green-400 bg-green-900/20 border-green-800' 
+              : 'text-green-600 bg-green-50 border-green-200'
+          }`}>
             <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
             <p id="email-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
           </div>
@@ -257,6 +276,7 @@ function PasswordField({
   getValidationClasses,
   showPassword,
   togglePasswordVisibility,
+  isDark,
 }: any) {
   return (
     <div className="space-y-2">
@@ -273,7 +293,11 @@ function PasswordField({
             if (error) setAnnounceMessage(error);
           }}
           placeholder={t('auth.password', { defaultValue: 'Contraseña' })}
-          className={`w-full pl-12 pr-20 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none ${getValidationClasses('password')}`}
+          className={`w-full pl-12 pr-20 py-4 text-lg rounded-xl border-2 transition-all duration-300 shadow-lg focus:shadow-xl focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 ${
+            isDark 
+              ? 'bg-slate-700 text-white border-slate-600' 
+              : 'bg-white text-slate-900 border-slate-200'
+          }`}
           aria-label={t('auth.password', { defaultValue: 'Contraseña' })}
           aria-invalid={!!errors.password}
           aria-describedby={`password-help ${errors.password ? "password-error" : ""} ${fieldValidation.password.isValid && fieldValidation.password.isTouched ? "password-success" : ""}`.trim()}
@@ -281,13 +305,19 @@ function PasswordField({
           required
         />
         <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-          <span className="text-xl text-gray-500 dark:text-gray-400" aria-hidden="true">🔒</span>
+          <span className={`text-xl ${
+            isDark ? 'text-slate-400' : 'text-slate-500'
+          }`} aria-hidden="true">🔒</span>
         </div>
         <div className="absolute right-12 top-1/2 -translate-y-1/2">
           <button
             type="button"
             onClick={togglePasswordVisibility}
-            className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:text-blue-600 dark:focus:text-blue-400 transition-all duration-200 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20"
+            className={`p-2 transition-all duration-200 rounded-lg focus:outline-none ${
+              isDark 
+                ? 'text-slate-400 hover:text-violet-400 focus:text-violet-400 hover:bg-violet-900/20 focus:bg-violet-900/20' 
+                : 'text-slate-500 hover:text-violet-600 focus:text-violet-600 hover:bg-violet-50 focus:bg-violet-50'
+            }`}
             aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
             tabIndex={0}
           >
@@ -300,7 +330,9 @@ function PasswordField({
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
             <span
               className={`text-lg font-bold ${
-                fieldValidation.password.isValid ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                fieldValidation.password.isValid 
+                  ? (isDark ? 'text-green-400' : 'text-green-600')
+                  : (isDark ? 'text-red-400' : 'text-red-600')
               }`}
               aria-hidden="true"
             >
@@ -310,19 +342,29 @@ function PasswordField({
         )}
       </div>
       <div className="px-2">
-        <p id="password-help" className="text-xs text-gray-500 dark:text-gray-400">
+        <p id="password-help" className={`text-xs ${
+          isDark ? 'text-gray-400' : 'text-gray-500'
+        }`}>
           🔑 {t('auth.passwordHelp', { defaultValue: 'Ingresa tu contraseña (mínimo 6 caracteres)' })}
         </p>
       </div>
       <div className="px-2">
         {errors.password && (
-          <div className="flex items-start gap-2 text-red-600 dark:text-red-400 text-sm animate-pulse bg-red-50 dark:bg-red-900/20 p-2 rounded-lg border border-red-200 dark:border-red-800">
+          <div className={`flex items-start gap-2 text-sm animate-pulse p-2 rounded-lg border ${
+            isDark 
+              ? 'text-red-400 bg-red-900/20 border-red-800' 
+              : 'text-red-600 bg-red-50 border-red-200'
+          }`}>
             <span className="text-base mt-0.5 flex-shrink-0" aria-label="Error">⚠️</span>
             <p id="password-error" role="alert" aria-live="polite">{errors.password}</p>
           </div>
         )}
         {fieldValidation.password.isValid && fieldValidation.password.isTouched && !errors.password && (
-          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm bg-green-50 dark:bg-green-900/20 p-2 rounded-lg border border-green-200 dark:border-green-800">
+          <div className={`flex items-center gap-2 text-sm p-2 rounded-lg border ${
+            isDark 
+              ? 'text-green-400 bg-green-900/20 border-green-800' 
+              : 'text-green-600 bg-green-50 border-green-200'
+          }`}>
             <span className="text-base flex-shrink-0" aria-label="Válido">✅</span>
             <p id="password-success" aria-live="polite">{t('auth.fieldValid', { defaultValue: 'Válido' })}</p>
           </div>
@@ -335,7 +377,7 @@ function PasswordField({
 export default function IniciarSesion() {
   // Forzar la clase dark y el idioma en <html> según preferencia del usuario
   const { t, i18n } = useTranslation();
-  const { resolvedTheme } = useTheme();
+  const { isDark } = useThemeForce();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "", general: "" });
@@ -438,10 +480,10 @@ export default function IniciarSesion() {
 
   // Effect para forzar re-renderización cuando cambia el tema
   useEffect(() => {
-    if (mounted && resolvedTheme) {
+    if (mounted) {
       setFieldValidation(prev => ({ ...prev }));
     }
-  }, [resolvedTheme, mounted]);
+  }, [mounted]);
 
   // Helper for email change
   function handleEmailChangeHelper(
@@ -522,7 +564,6 @@ export default function IniciarSesion() {
   const getValidationClasses = (field: 'email' | 'password') => {
     if (!mounted) return 'border-gray-300 bg-white text-gray-900 placeholder-gray-500';
     const validation = fieldValidation[field];
-    const isDark = resolvedTheme === 'dark';
     if (!validation.isTouched) {
       return isDark 
         ? 'border-gray-600 bg-gray-800 text-gray-100 placeholder-gray-400 focus:border-purple-400 focus:ring-purple-400'
@@ -593,9 +634,15 @@ export default function IniciarSesion() {
   };
 
   return (
-    <main className="min-h-[80vh] flex flex-col items-center justify-center bg-gradient-main px-4 py-12">
-      <section className="card w-full max-w-lg mx-auto text-center shadow-2xl animate-fade-in backdrop-blur-2xl bg-white/90 dark:bg-gray-900/90 border-2 border-primary/50 rounded-3xl p-12 transition-all duration-300 flex flex-col gap-8">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-8 tracking-tight drop-shadow-lg animate-fade-in">
+    <main className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-12">
+      <section className={`w-full max-w-lg mx-auto text-center shadow-2xl animate-fade-in rounded-xl p-12 flex flex-col gap-8 border ${
+        isDark 
+          ? 'bg-slate-800 border-slate-700' 
+          : 'bg-white border-slate-200'
+      }`}>
+        <h1 className={`text-4xl md:text-5xl font-extrabold mb-8 tracking-tight drop-shadow-lg animate-fade-in ${
+          isDark ? 'text-violet-400' : 'text-violet-600'
+        }`}>
           {t('auth.title', { defaultValue: 'Iniciar sesión' })}
         </h1>
         <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
@@ -611,6 +658,7 @@ export default function IniciarSesion() {
             errors={errors}
             fieldValidation={fieldValidation}
             getValidationClasses={getValidationClasses}
+            isDark={isDark}
           />
           <PasswordField
             password={password}
@@ -626,25 +674,42 @@ export default function IniciarSesion() {
             getValidationClasses={getValidationClasses}
             showPassword={showPassword}
             togglePasswordVisibility={togglePasswordVisibility}
+            isDark={isDark}
           />
           
           {/* Alertas del sistema */}
           <div className="space-y-3">
             {/* Alerta de bloqueo */}
             {isBlocked && (
-              <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700 rounded-xl p-4 shadow-lg">
+              <div className={`border-2 rounded-xl p-4 shadow-lg ${
+                isDark 
+                  ? 'bg-red-900/20 border-red-700' 
+                  : 'bg-red-50 border-red-300'
+              }`}>
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
                     <span className="text-2xl" aria-label="Bloqueado">🚫</span>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-red-800 dark:text-red-200 text-lg mb-2">ACCESO BLOQUEADO</h3>
-                    <p className="text-red-700 dark:text-red-300 mb-3">{t('auth.error.blocked', { time: blockTimeLeft })}</p>
-                    <div className="bg-red-100 dark:bg-red-900/30 rounded-lg p-3 border border-red-200 dark:border-red-800">
+                    <h3 className={`font-bold text-lg mb-2 ${
+                      isDark ? 'text-red-200' : 'text-red-800'
+                    }`}>ACCESO BLOQUEADO</h3>
+                    <p className={`mb-3 ${
+                      isDark ? 'text-red-300' : 'text-red-700'
+                    }`}>{t('auth.error.blocked', { time: blockTimeLeft })}</p>
+                    <div className={`rounded-lg p-3 border ${
+                      isDark 
+                        ? 'bg-red-900/30 border-red-800' 
+                        : 'bg-red-100 border-red-200'
+                    }`}>
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-lg" aria-label="Reloj">⏱️</span>
-                        <span className="text-red-800 dark:text-red-200 font-medium">Tiempo restante:</span>
-                        <span className="text-red-900 dark:text-red-100 font-mono text-xl font-bold">{blockTimeLeft}s</span>
+                        <span className={`font-medium ${
+                          isDark ? 'text-red-200' : 'text-red-800'
+                        }`}>Tiempo restante:</span>
+                        <span className={`font-mono text-xl font-bold ${
+                          isDark ? 'text-red-100' : 'text-red-900'
+                        }`}>{blockTimeLeft}s</span>
                       </div>
                     </div>
                   </div>
@@ -656,8 +721,8 @@ export default function IniciarSesion() {
             {attemptCount > 0 && !isBlocked && (
               <div className={`rounded-xl p-4 border-2 ${
                 attemptCount >= 2 
-                  ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200' 
-                  : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200'
+                  ? isDark ? 'bg-red-900/20 border-red-700 text-red-200' : 'bg-red-50 border-red-300 text-red-800'
+                  : isDark ? 'bg-yellow-900/20 border-yellow-700 text-yellow-200' : 'bg-yellow-50 border-yellow-300 text-yellow-800'
               }`}>
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
@@ -669,7 +734,11 @@ export default function IniciarSesion() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-semibold">Intento {attemptCount} de 3</span>
                       {attemptCount >= 2 && (
-                        <span className="px-2 py-1 bg-red-200 dark:bg-red-800/50 text-red-800 dark:text-red-200 rounded-full text-xs font-medium">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          isDark 
+                            ? 'bg-red-800/50 text-red-200' 
+                            : 'bg-red-200 text-red-800'
+                        }`}>
                           ¡ÚLTIMO INTENTO!
                         </span>
                       )}
@@ -687,14 +756,22 @@ export default function IniciarSesion() {
 
             {/* Error general */}
             {errors.general && (
-              <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-700 rounded-xl p-4 shadow-lg">
+              <div className={`border-2 rounded-xl p-4 shadow-lg ${
+                isDark 
+                  ? 'bg-red-900/20 border-red-700' 
+                  : 'bg-red-50 border-red-300'
+              }`}>
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-1">
                     <span className="text-xl" aria-label="Error">❌</span>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-red-800 dark:text-red-200 mb-1">Error de Autenticación</h3>
-                    <p id="general-error" className="text-red-700 dark:text-red-300" role="alert" aria-live="polite">
+                    <h3 className={`font-semibold mb-1 ${
+                      isDark ? 'text-red-200' : 'text-red-800'
+                    }`}>Error de Autenticación</h3>
+                    <p id="general-error" className={`${
+                      isDark ? 'text-red-300' : 'text-red-700'
+                    }`} role="alert" aria-live="polite">
                       {errors.general}
                     </p>
                   </div>
@@ -710,8 +787,12 @@ export default function IniciarSesion() {
               type="submit"
               className={`w-full py-4 px-8 text-lg font-bold rounded-xl border-2 transition-all duration-300 shadow-lg hover:shadow-xl ${
                 loading || isBlocked 
-                  ? 'bg-gray-300 dark:bg-gray-700 border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 border-blue-600 dark:border-blue-500 text-white hover:scale-105'
+                  ? isDark 
+                    ? 'bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-300 border-gray-400 text-gray-600 cursor-not-allowed'
+                  : isDark
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 border-blue-500 text-white hover:scale-105'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-blue-600 text-white hover:scale-105'
               }`}
               disabled={loading || isBlocked}
               aria-describedby={`${errors.general ? "general-error" : ""} ${isBlocked ? "blocked-message" : ""} button-help`.trim()}
@@ -729,10 +810,14 @@ export default function IniciarSesion() {
             
             {/* Texto de ayuda para navegación */}
             <div className="text-center mt-3">
-              <p id="button-help" className="text-xs text-gray-500 dark:text-gray-400">
+              <p id="button-help" className={`text-xs ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              }`}>
                 💡 {t('auth.accessibilityInstructions', { defaultValue: 'Instrucciones de accesibilidad: ' })}
                 </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className={`text-xs mt-1 ${
+                isDark ? 'text-gray-400' : 'text-gray-500'
+              }`}>
                 {t('auth.accessibilityInstructions1', { defaultValue: 'Usa Tab para navegar entre campos.' })}
                 <br />
                 {t('auth.accessibilityInstructions2', { defaultValue: 'Presiona Shift + Tab para retroceder.' })}
@@ -746,10 +831,18 @@ export default function IniciarSesion() {
 
         {/* Enlaces adicionales */}
         <div className="mt-8 flex flex-col gap-4 items-center text-base">
-          <a href="/olvido-contrasena" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 hover:underline font-semibold transition-colors">
+          <a href="/olvido-contrasena" className={`font-semibold transition-colors hover:underline ${
+            isDark 
+              ? 'text-blue-400 hover:text-blue-200' 
+              : 'text-blue-600 hover:text-blue-800'
+          }`}>
             🔐 {t('auth.forgot', { defaultValue: '¿Olvidaste tu contraseña?' })}
           </a>
-          <a href="/registrarse" className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200 hover:underline font-semibold transition-colors">
+          <a href="/registrarse" className={`font-semibold transition-colors hover:underline ${
+            isDark 
+              ? 'text-purple-400 hover:text-purple-200' 
+              : 'text-purple-600 hover:text-purple-800'
+          }`}>
             ✨ {t('auth.register', { defaultValue: '¿No tienes cuenta? Regístrate aquí.' })}
           </a>
         </div>

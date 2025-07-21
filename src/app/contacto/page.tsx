@@ -2,10 +2,12 @@
 import { useTranslation } from "react-i18next";
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "../../supabaseClient";
+import { useThemeForce } from "@/hooks/useThemeForce";
 import '../../i18n';
 
 export default function Contacto() {
   const { t } = useTranslation();
+  const { isDark } = useThemeForce();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -122,7 +124,7 @@ export default function Contacto() {
   };
 
   return (
-    <main className="min-h-[80vh] flex flex-col items-center justify-center fade-in bg-gradient-main px-2">
+    <main className="min-h-[80vh] flex flex-col items-center justify-center fade-in px-2">
       {/* Live region para anuncios de accesibilidad */}
       <output 
         className="sr-only" 
@@ -133,11 +135,19 @@ export default function Contacto() {
       </output>
 
       <div className="w-full flex flex-col items-center justify-center">
-        <header className="card w-full max-w-2xl mx-auto text-center mb-8 shadow-primary animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight drop-shadow-lg animate-fade-in">
+        <header className={`w-full max-w-2xl mx-auto text-center mb-8 shadow-lg animate-fade-in rounded-xl p-8 border ${
+          isDark 
+            ? 'bg-slate-800 border-slate-700' 
+            : 'bg-white border-slate-200'
+        }`}>
+          <h1 className={`text-4xl md:text-5xl font-extrabold mb-4 tracking-tight drop-shadow-lg animate-fade-in ${
+            isDark ? 'text-violet-400' : 'text-violet-600'
+          }`}>
             {t('contact.title')}
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-6 animate-fade-in">
+          <p className={`text-lg md:text-xl mb-6 animate-fade-in ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}>
             {t('contact.description')}
           </p>
         </header>
@@ -147,14 +157,20 @@ export default function Contacto() {
           <p className="sr-only">{t('contact.form.formDescription')}</p>
           
           <form 
-            className="card p-6 flex flex-col gap-4 border border-border shadow-primary" 
+            className={`p-6 flex flex-col gap-4 shadow-lg rounded-xl border ${
+              isDark 
+                ? 'bg-slate-800 border-slate-700' 
+                : 'bg-white border-slate-200'
+            }`} 
             onSubmit={handleSubmit}
             noValidate
             aria-describedby="required-fields-note"
           >
             <fieldset className="flex flex-col gap-2">
               <legend className="sr-only">Información personal</legend>
-              <label htmlFor="name" className="text-sm font-medium text-primary">
+              <label htmlFor="name" className={`text-sm font-medium ${
+                isDark ? 'text-violet-400' : 'text-violet-600'
+              }`}>
                 {t('contact.form.name')} <span className="text-red-500" aria-label={t('contact.form.requiredField')}>*</span>
               </label>
               <input 
@@ -165,8 +181,14 @@ export default function Contacto() {
                 value={form.name} 
                 onChange={handleChange} 
                 placeholder={t('contact.form.namePlaceholder')} 
-                className={`input rounded-lg border px-3 py-2 bg-card/80 text-card-foreground focus:outline-none focus:ring-2 transition-colors ${
-                  errors.name ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+                className={`rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 transition-colors ${
+                  isDark 
+                    ? 'bg-slate-700 text-white' 
+                    : 'bg-white text-slate-900'
+                } ${
+                  errors.name 
+                    ? 'border-red-500 focus:ring-red-500' 
+                    : (isDark ? 'border-slate-600' : 'border-slate-200') + ' focus:ring-violet-500'
                 }`}
                 required
                 aria-required="true"
@@ -179,12 +201,16 @@ export default function Contacto() {
                   {errors.name}
                 </p>
               )}
-              <p id="name-help" className="text-xs text-muted-foreground">{t('contact.form.nameHelp')}</p>
+              <p id="name-help" className={`text-xs ${
+                isDark ? 'text-slate-400' : 'text-slate-500'
+              }`}>{t('contact.form.nameHelp')}</p>
             </fieldset>
 
             <fieldset className="flex flex-col gap-2">
               <legend className="sr-only">Información de contacto</legend>
-              <label htmlFor="email" className="text-sm font-medium text-primary">
+              <label htmlFor="email" className={`text-sm font-medium ${
+                isDark ? 'text-violet-400' : 'text-violet-600'
+              }`}>
                 {t('contact.form.email')} <span className="text-red-500" aria-label={t('contact.form.requiredField')}>*</span>
               </label>
               <input 
@@ -195,8 +221,14 @@ export default function Contacto() {
                 value={form.email} 
                 onChange={handleChange} 
                 placeholder={t('contact.form.emailPlaceholder')} 
-                className={`input rounded-lg border px-3 py-2 bg-card/80 text-card-foreground focus:outline-none focus:ring-2 transition-colors ${
-                  errors.email ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+                className={`rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 transition-colors ${
+                  isDark 
+                    ? 'bg-slate-700 text-white' 
+                    : 'bg-white text-slate-900'
+                } ${
+                  errors.email 
+                    ? 'border-red-500 focus:ring-red-500' 
+                    : (isDark ? 'border-slate-600' : 'border-slate-200') + ' focus:ring-violet-500'
                 }`}
                 required
                 aria-required="true"
@@ -209,12 +241,16 @@ export default function Contacto() {
                   {errors.email}
                 </p>
               )}
-              <p id="email-help" className="text-xs text-muted-foreground">{t('contact.form.emailHelp')}</p>
+              <p id="email-help" className={`text-xs ${
+                isDark ? 'text-slate-400' : 'text-slate-500'
+              }`}>{t('contact.form.emailHelp')}</p>
             </fieldset>
 
             <fieldset className="flex flex-col gap-2">
               <legend className="sr-only">Mensaje</legend>
-              <label htmlFor="message" className="text-sm font-medium text-primary">
+              <label htmlFor="message" className={`text-sm font-medium ${
+                isDark ? 'text-violet-400' : 'text-violet-600'
+              }`}>
                 {t('contact.form.message')} <span className="text-red-500" aria-label={t('contact.form.requiredField')}>*</span>
               </label>
               <textarea 
@@ -225,8 +261,14 @@ export default function Contacto() {
                 value={form.message} 
                 onChange={handleChange} 
                 placeholder={t('contact.form.messagePlaceholder')} 
-                className={`input rounded-lg border px-3 py-2 bg-card/80 text-card-foreground focus:outline-none focus:ring-2 transition-colors resize-none ${
-                  errors.message ? 'border-red-500 focus:ring-red-500' : 'border-border focus:ring-primary'
+                className={`rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 transition-colors resize-none ${
+                  isDark 
+                    ? 'bg-slate-700 text-white' 
+                    : 'bg-white text-slate-900'
+                } ${
+                  errors.message 
+                    ? 'border-red-500 focus:ring-red-500' 
+                    : (isDark ? 'border-slate-600' : 'border-slate-200') + ' focus:ring-violet-500'
                 }`}
                 required
                 aria-required="true"
@@ -239,34 +281,50 @@ export default function Contacto() {
                   {errors.message}
                 </p>
               )}
-              <p id="message-help" className="text-xs text-muted-foreground">{t('contact.form.messageHelp')}</p>
+              <p id="message-help" className={`text-xs ${
+                isDark ? 'text-slate-400' : 'text-slate-500'
+              }`}>{t('contact.form.messageHelp')}</p>
             </fieldset>
 
             {errors.general && (
               <div 
-                className="bg-red-50 border border-red-200 rounded-lg p-3" 
+                className={`rounded-lg p-3 border ${
+                  isDark 
+                    ? 'bg-red-900/20 border-red-800' 
+                    : 'bg-red-50 border-red-200'
+                }`}
                 role="alert" 
                 aria-live="assertive"
               >
-                <p className="text-red-700 text-sm">{errors.general}</p>
+                <p className={`text-sm ${
+                  isDark ? 'text-red-400' : 'text-red-700'
+                }`}>{errors.general}</p>
               </div>
             )}
 
             {success && (
               <div 
-                className="bg-green-50 border border-green-200 rounded-lg p-3" 
+                className={`rounded-lg p-3 border ${
+                  isDark 
+                    ? 'bg-green-900/20 border-green-800' 
+                    : 'bg-green-50 border-green-200'
+                }`}
                 role="alert" 
                 aria-live="polite"
               >
-                <p className="text-green-700 text-sm font-medium mb-1">{t('contact.form.success')}</p>
-                <p className="text-green-600 text-xs">{t('contact.form.successDetails')}</p>
+                <p className={`text-sm font-medium mb-1 ${
+                  isDark ? 'text-green-400' : 'text-green-700'
+                }`}>{t('contact.form.success')}</p>
+                <p className={`text-xs ${
+                  isDark ? 'text-green-300' : 'text-green-600'
+                }`}>{t('contact.form.successDetails')}</p>
               </div>
             )}
 
             <button 
               ref={submitButtonRef}
               type="submit" 
-              className="btn bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold py-3 px-6 rounded-lg shadow hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" 
+              className="bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold py-3 px-6 rounded-lg shadow hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2" 
               disabled={loading}
               aria-describedby={loading ? 'button-loading' : undefined}
               aria-label={loading ? t('contact.form.loadingAria') : t('contact.form.submitAria')}
@@ -293,7 +351,9 @@ export default function Contacto() {
               <span id="button-loading" className="sr-only">{t('contact.form.loadingAria')}</span>
             )}
 
-            <p id="required-fields-note" className="text-xs text-muted-foreground text-center mt-2">
+            <p id="required-fields-note" className={`text-xs text-center mt-2 ${
+              isDark ? 'text-slate-400' : 'text-slate-500'
+            }`}>
               <span className="text-red-500" aria-label={t('contact.form.requiredField')}>*</span> Campos obligatorios
             </p>
           </form>

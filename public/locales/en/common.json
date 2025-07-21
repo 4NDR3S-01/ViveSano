@@ -264,6 +264,9 @@
     "stats": "Your statistics",
     "welcome": "Hello! Start your journey to a healthier life",
     "nav": {
+      "main": "Main",
+      "account": "Account",
+      "preferences": "Preferences", 
       "overview": "Overview",
       "habits": "Habits",
       "challenges": "Challenges", 
@@ -292,5 +295,13 @@
       "log_activity": "Log activity",
       "view_challenges": "View challenges"
     }
+  },
+  "theme": {
+    "toggle": "Change theme",
+    "dark": "Dark Mode",
+    "light": "Light Mode"
+  },
+  "language": {
+    "toggle": "Change language"
   }
 }
