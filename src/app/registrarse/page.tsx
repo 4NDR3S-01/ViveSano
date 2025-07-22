@@ -11,12 +11,14 @@ export default function Registrarse() {
   const { isDark } = useThemeForce();
   
   // Estados del formulario
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({ 
-    name: "", 
+    firstName: "", 
+    lastName: "",
     email: "", 
     password: "", 
     confirmPassword: "", 
@@ -43,17 +45,16 @@ export default function Registrarse() {
     }
   });
   const [fieldValidation, setFieldValidation] = useState({ 
-    name: { touched: false, focused: false },
+    firstName: { touched: false, focused: false },
+    lastName: { touched: false, focused: false },
     email: { touched: false, focused: false },
     password: { touched: false, focused: false },
     confirmPassword: { touched: false, focused: false }
   });
-  
-  // Estado adicional para compatibilidad
-  const [error, setError] = useState("");
 
   // Referencias para el manejo del foco
-  const nameInputRef = useRef<HTMLInputElement>(null);
+  const firstNameInputRef = useRef<HTMLInputElement>(null);
+  const lastNameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
@@ -103,8 +104,8 @@ export default function Registrarse() {
 
   // Foco automático en el campo de nombre al cargar
   useEffect(() => {
-    if (nameInputRef.current) {
-      nameInputRef.current.focus();
+    if (firstNameInputRef.current) {
+      firstNameInputRef.current.focus();
     }
   }, []);
 
@@ -127,18 +128,34 @@ export default function Registrarse() {
   }, [isBlocked, blockTimeLeft, t]);
 
   // Funciones de validación en tiempo real
-  const validateName = (value: string) => {
+  const validateFirstName = (value: string) => {
     if (!value.trim()) {
-      return t('auth.error.name_required', { defaultValue: 'El nombre es obligatorio.' });
+      return t('auth.error.first_name_required', { defaultValue: 'El nombre es obligatorio.' });
     }
     if (value.trim().length < 2) {
-      return t('auth.error.name_min_length', { defaultValue: 'El nombre debe tener al menos 2 caracteres.' });
+      return t('auth.error.first_name_min_length', { defaultValue: 'El nombre debe tener al menos 2 caracteres.' });
     }
     if (value.trim().length > 50) {
-      return t('auth.error.name_max_length', { defaultValue: 'El nombre no puede exceder 50 caracteres.' });
+      return t('auth.error.first_name_max_length', { defaultValue: 'El nombre no puede exceder 50 caracteres.' });
     }
     if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(value.trim())) {
-      return t('auth.error.name_invalid_chars', { defaultValue: 'El nombre solo puede contener letras y espacios.' });
+      return t('auth.error.first_name_invalid_chars', { defaultValue: 'El nombre solo puede contener letras y espacios.' });
+    }
+    return "";
+  };
+
+  const validateLastName = (value: string) => {
+    if (!value.trim()) {
+      return t('auth.error.last_name_required', { defaultValue: 'El apellido es obligatorio.' });
+    }
+    if (value.trim().length < 2) {
+      return t('auth.error.last_name_min_length', { defaultValue: 'El apellido debe tener al menos 2 caracteres.' });
+    }
+    if (value.trim().length > 50) {
+      return t('auth.error.last_name_max_length', { defaultValue: 'El apellido no puede exceder 50 caracteres.' });
+    }
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(value.trim())) {
+      return t('auth.error.last_name_invalid_chars', { defaultValue: 'El apellido solo puede contener letras y espacios.' });
     }
     return "";
   };
@@ -337,17 +354,32 @@ export default function Registrarse() {
   };
 
   // Validación en tiempo real durante la escritura
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setName(value);
+    setFirstName(value);
     
-    const error = validateName(value);
-    setErrors(prev => ({ ...prev, name: error }));
+    const error = validateFirstName(value);
+    setErrors(prev => ({ ...prev, firstName: error }));
     
-    if (fieldValidation.name.touched) {
+    if (fieldValidation.firstName.touched) {
       setFieldValidation(prev => ({
         ...prev,
-        name: { ...prev.name, touched: true }
+        firstName: { ...prev.firstName, touched: true }
+      }));
+    }
+  };
+
+  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLastName(value);
+    
+    const error = validateLastName(value);
+    setErrors(prev => ({ ...prev, lastName: error }));
+    
+    if (fieldValidation.lastName.touched) {
+      setFieldValidation(prev => ({
+        ...prev,
+        lastName: { ...prev.lastName, touched: true }
       }));
     }
   };
@@ -424,8 +456,11 @@ export default function Registrarse() {
     // Validar el campo al perder el foco
     let error = "";
     switch (field) {
-      case 'name':
-        error = validateName(name);
+      case 'firstName':
+        error = validateFirstName(firstName);
+        break;
+      case 'lastName':
+        error = validateLastName(lastName);
         break;
       case 'email':
         error = validateEmail(email);
@@ -450,13 +485,14 @@ export default function Registrarse() {
   };
 
   // Funciones de foco para navegación
+  const focusLastName = () => lastNameInputRef.current?.focus();
   const focusEmail = () => emailInputRef.current?.focus();
   const focusPassword = () => passwordInputRef.current?.focus();
   const focusConfirmPassword = () => confirmPasswordInputRef.current?.focus();
   const focusSubmit = () => submitButtonRef.current?.focus();
 
   // Función para obtener clases de validación con soporte completo de modo oscuro
-  const getValidationClasses = (field: 'name' | 'email' | 'password' | 'confirmPassword') => {
+  const getValidationClasses = (field: 'firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword') => {
     if (!mounted) return 'w-full py-4 text-lg rounded-2xl border-2 transition-all duration-200 shadow-lg focus:shadow-xl focus:outline-none border-gray-300 bg-white text-gray-900';
     
     const validation = fieldValidation[field];
@@ -532,21 +568,22 @@ export default function Registrarse() {
     if (loading || isBlocked) return;
 
     // Limpiar mensajes anteriores
-    setError("");
     setSuccess("");
-    setErrors({ name: "", email: "", password: "", confirmPassword: "", general: "" });
+    setErrors({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "", general: "" });
 
     // Validar todos los campos
-    const nameError = validateName(name);
+    const firstNameError = validateFirstName(firstName);
+    const lastNameError = validateLastName(lastName);
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
     const confirmPasswordError = validateConfirmPassword(confirmPassword);
 
-    const hasErrors = nameError || emailError || passwordError || confirmPasswordError;
+    const hasErrors = firstNameError || lastNameError || emailError || passwordError || confirmPasswordError;
 
     if (hasErrors) {
       setErrors({
-        name: nameError,
+        firstName: firstNameError,
+        lastName: lastNameError,
         email: emailError,
         password: passwordError,
         confirmPassword: confirmPasswordError,
@@ -560,8 +597,10 @@ export default function Registrarse() {
       }));
 
       // Foco en el primer campo con error
-      if (nameError && nameInputRef.current) {
-        nameInputRef.current.focus();
+      if (firstNameError && firstNameInputRef.current) {
+        firstNameInputRef.current.focus();
+      } else if (lastNameError && lastNameInputRef.current) {
+        lastNameInputRef.current.focus();
       } else if (emailError && emailInputRef.current) {
         emailInputRef.current.focus();
       } else if (passwordError && passwordInputRef.current) {
@@ -582,7 +621,8 @@ export default function Registrarse() {
         password: password,
         options: {
           data: {
-            name: name
+            first_name: firstName.trim(),
+            last_name: lastName.trim()
           }
         }
       });
@@ -609,7 +649,7 @@ export default function Registrarse() {
           setErrors(prev => ({ ...prev, password: errorMessage }));
         }
 
-        setError(errorMessage);
+        setErrors(prev => ({ ...prev, general: errorMessage }));
         setAttemptCount(prev => {
           const newCount = prev + 1;
           if (newCount >= 3) {
@@ -631,13 +671,15 @@ export default function Registrarse() {
         
         // Limpiar formulario después del éxito
         setTimeout(() => {
-          setName("");
+          setFirstName("");
+          setLastName("");
           setEmail("");
           setPassword("");
           setConfirmPassword("");
-          setErrors({ name: "", email: "", password: "", confirmPassword: "", general: "" });
+          setErrors({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "", general: "" });
           setFieldValidation({
-            name: { touched: false, focused: false },
+            firstName: { touched: false, focused: false },
+            lastName: { touched: false, focused: false },
             email: { touched: false, focused: false },
             password: { touched: false, focused: false },
             confirmPassword: { touched: false, focused: false }
@@ -646,8 +688,11 @@ export default function Registrarse() {
       }
     } catch (err) {
       console.error('Error durante el registro:', err);
-      setError(t('auth.error.network', { 
-        defaultValue: 'Error de conexión. Verifica tu internet e inténtalo de nuevo.' 
+      setErrors(prev => ({ 
+        ...prev, 
+        general: t('auth.error.network', { 
+          defaultValue: 'Error de conexión. Verifica tu internet e inténtalo de nuevo.' 
+        })
       }));
       setAttemptCount(prev => prev + 1);
     } finally {
@@ -721,34 +766,34 @@ export default function Registrarse() {
                 </div>
               </div>
               <input
-                ref={nameInputRef}
+                ref={firstNameInputRef}
                 type="text"
-                id="register-name"
-                value={name}
-                onChange={handleNameChange}
-                onFocus={() => handleFieldFocus('name')}
-                onBlur={() => handleFieldBlur('name')}
-                onKeyDown={(e) => handleKeyDown(e, focusEmail)}
-                placeholder={t('register.name', { defaultValue: 'Nombre completo' })}
-                className={`${getValidationClasses('name')} pl-16 pr-4`}
-                aria-label={t('register.name', { defaultValue: 'Nombre completo' })}
-                aria-describedby={errors.name ? 'name-error' : 'name-help'}
-                aria-invalid={!!errors.name}
+                id="register-firstName"
+                value={firstName}
+                onChange={handleFirstNameChange}
+                onFocus={() => handleFieldFocus('firstName')}
+                onBlur={() => handleFieldBlur('firstName')}
+                onKeyDown={(e) => handleKeyDown(e, focusLastName)}
+                placeholder={t('register.firstName', { defaultValue: 'Nombre' })}
+                className={`${getValidationClasses('firstName')} pl-16 pr-4`}
+                aria-label={t('register.firstName', { defaultValue: 'Nombre' })}
+                aria-describedby={errors.firstName ? 'firstName-error' : 'firstName-help'}
+                aria-invalid={!!errors.firstName}
                 aria-required="true"
-                autoComplete="name"
+                autoComplete="given-name"
                 disabled={loading || isBlocked}
               />
             </div>
             
             {/* Ayuda del campo */}
-            <div id="name-help" className="sr-only">
-              {t('auth.name_help', { defaultValue: 'Ingresa tu nombre completo. Mínimo 2 caracteres, solo letras y espacios.' })}
+            <div id="firstName-help" className="sr-only">
+              {t('auth.firstName_help', { defaultValue: 'Ingresa tu nombre. Mínimo 2 caracteres, solo letras y espacios.' })}
             </div>
             
             {/* Mensaje de error */}
-            {errors.name && (
+            {errors.firstName && (
               <div 
-                id="name-error" 
+                id="firstName-error" 
                 className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
                   isDark ? 'text-red-400' : 'text-red-600'
                 }`}
@@ -756,12 +801,72 @@ export default function Registrarse() {
                 aria-live="polite"
               >
                 <span className="text-base" role="img" aria-label={t('auth.error_icon_label', { defaultValue: 'Error' })}>⚠️</span>
-                <span>{errors.name}</span>
+                <span>{errors.firstName}</span>
               </div>
             )}
             
             {/* Indicador de validez */}
-            {name && !errors.name && fieldValidation.name.touched && (
+            {firstName && !errors.firstName && fieldValidation.firstName.touched && (
+              <div className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                isDark ? 'text-green-400' : 'text-green-600'
+              }`}>
+                <span className="text-base" role="img" aria-label={t('auth.success_icon_label', { defaultValue: 'Válido' })}>✅</span>
+                <span>{t('auth.field_valid', { defaultValue: 'Campo válido' })}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Campo Apellido */}
+          <div className="relative">
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-indigo-900/30 to-indigo-800/20' 
+                    : 'bg-gradient-to-br from-indigo-100 to-indigo-50'
+                }`}>
+                  <span className="text-lg">👥</span>
+                </div>
+              </div>
+              <input
+                ref={lastNameInputRef}
+                type="text"
+                id="register-lastName"
+                value={lastName}
+                onChange={handleLastNameChange}
+                onFocus={() => handleFieldFocus('lastName')}
+                onBlur={() => handleFieldBlur('lastName')}
+                onKeyDown={(e) => handleKeyDown(e, focusEmail)}
+                placeholder={t('register.lastName', { defaultValue: 'Apellido' })}
+                className={`${getValidationClasses('lastName')} pl-16 pr-4`}
+                aria-label={t('register.lastName', { defaultValue: 'Apellido' })}
+                aria-describedby={errors.lastName ? 'lastName-error' : 'lastName-help'}
+                aria-invalid={!!errors.lastName}
+                aria-required="true"
+                autoComplete="family-name"
+                disabled={loading || isBlocked}
+              />
+            </div>
+            
+            <div id="lastName-help" className="sr-only">
+              {t('auth.lastName_help', { defaultValue: 'Ingresa tu apellido. Mínimo 2 caracteres, solo letras y espacios.' })}
+            </div>
+            
+            {errors.lastName && (
+              <div 
+                id="lastName-error" 
+                className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
+                  isDark ? 'text-red-400' : 'text-red-600'
+                }`}
+                role="alert"
+                aria-live="polite"
+              >
+                <span className="text-base" role="img" aria-label={t('auth.error_icon_label', { defaultValue: 'Error' })}>⚠️</span>
+                <span>{errors.lastName}</span>
+              </div>
+            )}
+            
+            {lastName && !errors.lastName && fieldValidation.lastName.touched && (
               <div className={`flex items-center gap-2 mt-2 text-sm animate-fade-in ${
                 isDark ? 'text-green-400' : 'text-green-600'
               }`}>
@@ -981,7 +1086,7 @@ export default function Registrarse() {
 
           {/* Mensajes de estado del formulario */}
           <div className="space-y-3">
-            {error && (
+            {errors.general && (
               <div 
                 className={`flex items-center gap-3 p-4 rounded-xl animate-fade-in ${
                   isDark 
@@ -992,7 +1097,7 @@ export default function Registrarse() {
                 aria-live="polite"
               >
                 <span className="text-xl flex-shrink-0" role="img" aria-label={t('auth.error_icon_label', { defaultValue: 'Error' })}>❌</span>
-                <span className="text-sm font-medium">{error}</span>
+                <span className="text-sm font-medium">{errors.general}</span>
               </div>
             )}
             
@@ -1035,11 +1140,11 @@ export default function Registrarse() {
           <button
             ref={submitButtonRef}
             type="submit"
-            disabled={loading || isBlocked || (!name || !email || !password || !confirmPassword)}
+            disabled={loading || isBlocked || (!firstName || !lastName || !email || !password || !confirmPassword)}
             className={`
               relative w-full py-4 px-6 rounded-2xl text-lg font-semibold transition-all duration-300 shadow-xl
               focus:outline-none focus:ring-4 focus:ring-purple-500/50 
-              ${loading || isBlocked || (!name || !email || !password || !confirmPassword)
+              ${loading || isBlocked || (!firstName || !lastName || !email || !password || !confirmPassword)
                 ? (isDark 
                     ? 'bg-gray-700 border border-gray-600 text-gray-400 cursor-not-allowed' 
                     : 'bg-gray-200 border border-gray-300 text-gray-500 cursor-not-allowed')
@@ -1047,7 +1152,7 @@ export default function Registrarse() {
                     ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white border border-purple-500 hover:border-purple-400 shadow-lg hover:shadow-purple-500/30'
                     : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white border border-purple-600 hover:border-purple-500 shadow-lg hover:shadow-purple-500/30')
               }
-              ${loading || isBlocked || (!name || !email || !password || !confirmPassword) 
+              ${loading || isBlocked || (!firstName || !lastName || !email || !password || !confirmPassword) 
                 ? '' 
                 : 'hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98]'
               }
@@ -1056,7 +1161,7 @@ export default function Registrarse() {
             aria-describedby="submit-button-help"
           >
             {/* Efecto de brillo para botón activo */}
-            {!loading && !isBlocked && name && email && password && confirmPassword && (
+            {!loading && !isBlocked && firstName && lastName && email && password && confirmPassword && (
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 animate-pulse opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             )}
             

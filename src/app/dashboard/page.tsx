@@ -17,13 +17,13 @@ const getQuickActions = (t: any, isDark: boolean) => [
     href: "/dashboard/habits/new"
   },
   {
-    id: 'log-activity',
-    title: t('dashboard.quick_actions.log_activity', { defaultValue: 'Registrar Actividad' }),
-    icon: "📝",
+    id: 'view-progress',
+    title: t('dashboard.quick_actions.view_progress', { defaultValue: 'Ver Progreso' }),
+    icon: "📈",
     color: "text-blue-600",
     bg: isDark ? "bg-blue-900" : "bg-blue-50",
     border: isDark ? "border-blue-700" : "border-blue-200",
-    href: "/dashboard/activities/log"
+    href: "/dashboard/progress"
   },
   {
     id: 'view-challenges',

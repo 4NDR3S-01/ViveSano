@@ -107,8 +107,8 @@
     "quickActions": {
       "title": "Quick Actions",
       "addHabit": "Add Habit",
-      "viewChallenges": "View Challenges",
-      "checkProgress": "Check Progress"
+      "viewProgress": "View Progress",
+      "viewChallenges": "View Challenges"
     }
   },
   "habits": {

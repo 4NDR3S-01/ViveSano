@@ -60,9 +60,10 @@ const EmptyState = ({ t, isDark }: { t: any; isDark: boolean }) => (
 );
 
 // Componente de tarjeta de hábito
-const HabitCard = ({ habit, onToggle, isDark, t }: { 
+const HabitCard = ({ habit, onToggle, onDelete, isDark, t }: { 
   habit: any; 
-  onToggle: () => void; 
+  onToggle: () => void;
+  onDelete: () => void;
   isDark: boolean;
   t: any;
 }) => {
@@ -118,18 +119,35 @@ const HabitCard = ({ habit, onToggle, isDark, t }: {
             </p>
           </div>
         </div>
-        <button
-          onClick={canIncrement ? onToggle : undefined}
-          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${getToggleButtonClasses()}`}
-          aria-label={
-            isFullyCompleted 
-              ? 'Hábito completado' 
-              : 'Incrementar progreso'
-          }
-          disabled={!canIncrement}
-        >
-          {getButtonContent()}
-        </button>
+        <div className="flex gap-2">
+          {/* Botón de eliminar */}
+          <button
+            onClick={onDelete}
+            className="w-8 h-8 rounded-full border flex items-center justify-center transition-colors hover:bg-red-50 hover:border-red-300 text-red-500"
+            style={{
+              borderColor: isDark ? '#475569' : '#e2e8f0',
+            }}
+            aria-label="Eliminar hábito"
+            title="Eliminar hábito"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+          {/* Botón de toggle/completar */}
+          <button
+            onClick={canIncrement ? onToggle : undefined}
+            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${getToggleButtonClasses()}`}
+            aria-label={
+              isFullyCompleted 
+                ? 'Hábito completado' 
+                : 'Incrementar progreso'
+            }
+            disabled={!canIncrement}
+          >
+            {getButtonContent()}
+          </button>
+        </div>
       </div>
 
       {/* Descripción */}
@@ -204,6 +222,8 @@ export default function HabitsPage() {
   const { t } = useTranslation();
   const { isDark } = useThemeForce();
   const [mounted, setMounted] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState<any>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Usar el hook real del dashboard para obtener hábitos
   const { 
@@ -211,12 +231,30 @@ export default function HabitsPage() {
     isLoading, 
     error, 
     toggleHabit, 
+    deleteHabit,
     refresh
   } = useDashboard();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Función para manejar la eliminación de un hábito
+  const handleDeleteHabit = async () => {
+    if (!habitToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const success = await deleteHabit(habitToDelete.id);
+      if (success) {
+        setHabitToDelete(null);
+      }
+    } catch (error) {
+      console.error('Error eliminando hábito:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (!mounted) {
     return <LoadingSkeleton />;
@@ -265,12 +303,72 @@ export default function HabitsPage() {
               key={habit.id} 
               habit={habit} 
               onToggle={() => toggleHabit(habit.id)} 
+              onDelete={() => setHabitToDelete(habit)}
               isDark={isDark}
               t={t}
             />
           ))
         )}
       </div>
+
+      {/* Modal de confirmación para eliminar hábito */}
+      {habitToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div
+            className="rounded-xl p-6 max-w-md w-full"
+            style={{
+              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+              border: `1px solid ${isDark ? '#475569' : '#e2e8f0'}`
+            }}
+          >
+            <div className="text-center">
+              <div className="text-red-500 text-5xl mb-4">🗑️</div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: isDark ? '#ffffff' : '#1e293b' }}>
+                {t('habits.delete.title', { defaultValue: '¿Eliminar hábito?' })}
+              </h3>
+              <p className="text-sm mb-2" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
+                {t('habits.delete.message', { 
+                  defaultValue: 'Estás a punto de eliminar el hábito "{{habitName}}". Esta acción no se puede deshacer.', 
+                  habitName: habitToDelete.name 
+                })}
+              </p>
+              <p className="text-xs mb-6" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
+                {t('habits.delete.note', { defaultValue: 'Los datos históricos se preservarán para estadísticas.' })}
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setHabitToDelete(null)}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors"
+                  style={{
+                    backgroundColor: isDark ? '#475569' : '#f1f5f9',
+                    color: isDark ? '#f1f5f9' : '#475569',
+                    opacity: isDeleting ? 0.5 : 1
+                  }}
+                >
+                  {t('habits.delete.cancel', { defaultValue: 'Cancelar' })}
+                </button>
+                <button
+                  onClick={handleDeleteHabit}
+                  disabled={isDeleting}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                  style={{ opacity: isDeleting ? 0.5 : 1 }}
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      {t('habits.delete.deleting', { defaultValue: 'Eliminando...' })}
+                    </>
+                  ) : (
+                    t('habits.delete.confirm', { defaultValue: 'Eliminar' })
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -308,7 +308,7 @@
     "quick_actions": {
       "title": "Acciones rápidas",
       "add_habit": "Agregar hábito",
-      "log_activity": "Registrar actividad",
+      "view_progress": "Ver progreso",
       "view_challenges": "Ver retos"
     }
   },

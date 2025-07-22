@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
       <Sidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
 
       {/* Contenido principal */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-screen lg:ml-0">
         {/* Header móvil */}
         <header className={`lg:hidden sticky top-0 z-20 ${isDark ? 'bg-slate-900 border-b border-slate-700' : 'bg-white border-b border-slate-200'} shadow-sm`}>
           <div className="flex items-center justify-between px-4 py-3">
@@ -150,10 +150,8 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
         </header>
 
         {/* Contenido de la página */}
-        <main className={`flex-1 overflow-hidden ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
-          <div className="h-full overflow-y-auto">
-            {children}
-          </div>
+        <main className={`flex-1 ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
+          {children}
         </main>
       </div>
     </div>

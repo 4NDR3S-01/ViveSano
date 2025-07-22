@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeForce } from "../../../hooks/useThemeForce";
 import { useDashboard } from "../../../hooks/useDashboard";
+import { useProgress } from "../../../hooks/useProgress";
 import '../../../i18n';
 
 // Componente de carga
@@ -69,7 +70,7 @@ const SimpleChart = ({ title, data, isDark, type = 'bar' }: {
     </h3>
     <div className="h-48 flex items-end justify-between gap-2">
       {data.map((item, index) => (
-        <div key={index} className="flex flex-col items-center flex-1">
+        <div key={`${item.label}-${index}`} className="flex flex-col items-center flex-1">
           <div
             className="bg-violet-500 rounded-t min-h-4 w-full mb-2 transition-all duration-300 hover:bg-violet-600"
             style={{ height: `${item.value}%` }}
@@ -84,30 +85,33 @@ const SimpleChart = ({ title, data, isDark, type = 'bar' }: {
 );
 
 // Componente de actividad reciente
-const RecentActivity = ({ isDark, t }: { isDark: boolean; t: any }) => {
-  const activities = [
-    {
-      id: '1',
-      action: 'Completó hábito "Beber agua"',
-      time: 'Hace 2 horas',
-      icon: '💧',
-      points: '+10'
-    },
-    {
-      id: '2',
-      action: 'Completó hábito "Meditación"',
-      time: 'Hace 5 horas',
-      icon: '🧘',
-      points: '+25'
-    },
-    {
-      id: '3',
-      action: 'Unido al desafío "7 días de ejercicio"',
-      time: 'Ayer',
-      icon: '🏃',
-      points: '+50'
-    }
-  ];
+const RecentActivity = ({ isDark, t, activities }: { 
+  isDark: boolean; 
+  t: any; 
+  activities: any[];
+}) => {
+  if (activities.length === 0) {
+    return (
+      <div
+        className="border rounded-xl p-6"
+        style={{
+          backgroundColor: isDark ? '#1e293b' : '#ffffff',
+          borderColor: isDark ? '#475569' : '#e2e8f0',
+          color: isDark ? '#f1f5f9' : '#1e293b'
+        }}
+      >
+        <h3 className="text-lg font-semibold mb-4" style={{ color: isDark ? '#ffffff' : '#1e293b' }}>
+          {t('progress.recent_activity', { defaultValue: 'Actividad Reciente' })}
+        </h3>
+        <div className="text-center py-8">
+          <div className="text-4xl mb-2">📊</div>
+          <p className="text-sm" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
+            {t('progress.no_activity', { defaultValue: 'No hay actividad reciente' })}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -119,9 +123,9 @@ const RecentActivity = ({ isDark, t }: { isDark: boolean; t: any }) => {
       }}
     >
       <h3 className="text-lg font-semibold mb-4" style={{ color: isDark ? '#ffffff' : '#1e293b' }}>
-        Actividad Reciente
+        {t('progress.recent_activity', { defaultValue: 'Actividad Reciente' })}
       </h3>
-      <div className="space-y-3">
+      <div className="space-y-3 max-h-64 overflow-y-auto">
         {activities.map((activity) => (
           <div key={activity.id} className="flex items-center gap-3 py-2">
             <span className="text-2xl">{activity.icon}</span>
@@ -146,12 +150,19 @@ export default function ProgressPage() {
   const { isDark } = useThemeForce();
   const [mounted, setMounted] = useState(false);
   
-  // Usar datos reales del dashboard
+  // Usar datos reales del dashboard y progreso
   const { 
-    isLoading, 
-    error, 
+    isLoading: dashboardLoading, 
     getFormattedStats
   } = useDashboard();
+  
+  const {
+    weeklyData,
+    monthlyData,
+    recentActivity,
+    isLoading: progressLoading,
+    error
+  } = useProgress();
 
   useEffect(() => {
     setMounted(true);
@@ -161,29 +172,41 @@ export default function ProgressPage() {
     return <LoadingSkeleton />;
   }
 
-  if (isLoading) {
+  if (dashboardLoading || progressLoading) {
     return <LoadingSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className={`p-4 rounded-lg ${isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border`}>
+          <p className={`text-sm ${isDark ? 'text-red-400' : 'text-red-600'}`}>
+            {t('progress.error', { defaultValue: 'Error cargando datos de progreso' })}: {error}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // Obtener estadísticas reales
   const stats = getFormattedStats(t) || [];
 
-  // Datos de ejemplo para los gráficos
-  const weeklyData = [
-    { label: 'Lun', value: 80 },
-    { label: 'Mar', value: 65 },
-    { label: 'Mié', value: 90 },
-    { label: 'Jue', value: 75 },
-    { label: 'Vie', value: 95 },
-    { label: 'Sáb', value: 70 },
-    { label: 'Dom', value: 85 }
+  // Usar datos reales o datos de ejemplo como fallback
+  const finalWeeklyData = weeklyData.length > 0 ? weeklyData : [
+    { label: 'Lun', value: 0 },
+    { label: 'Mar', value: 0 },
+    { label: 'Mié', value: 0 },
+    { label: 'Jue', value: 0 },
+    { label: 'Vie', value: 0 },
+    { label: 'Sáb', value: 0 },
+    { label: 'Dom', value: 0 }
   ];
 
-  const monthlyData = [
-    { label: 'S1', value: 60 },
-    { label: 'S2', value: 75 },
-    { label: 'S3', value: 85 },
-    { label: 'S4', value: 70 }
+  const finalMonthlyData = monthlyData.length > 0 ? monthlyData : [
+    { label: 'S1', value: 0 },
+    { label: 'S2', value: 0 },
+    { label: 'S3', value: 0 },
+    { label: 'S4', value: 0 }
   ];
 
   return (
@@ -209,20 +232,20 @@ export default function ProgressPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <SimpleChart 
           title={t('progress.weekly', { defaultValue: 'Esta Semana' })}
-          data={weeklyData}
+          data={finalWeeklyData}
           isDark={isDark}
           type="bar"
         />
         <SimpleChart 
           title={t('progress.monthly', { defaultValue: 'Este Mes' })}
-          data={monthlyData}
+          data={finalMonthlyData}
           isDark={isDark}
           type="bar"
         />
       </div>
 
       {/* Actividad reciente */}
-      <RecentActivity isDark={isDark} t={t} />
+      <RecentActivity isDark={isDark} t={t} activities={recentActivity} />
     </div>
   );
 }

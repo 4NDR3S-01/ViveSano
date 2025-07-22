@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { useThemeForce } from "../../../../hooks/useThemeForce";
-import { supabase } from "../../../../supabaseClient";
+import { useDashboard } from "../../../../hooks/useDashboard";
 import '../../../../i18n';
 
 interface HabitFormData {
@@ -53,6 +53,7 @@ export default function NewHabitPage() {
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { createHabit } = useDashboard();
 
   const [formData, setFormData] = useState<HabitFormData>({
     name: '',
@@ -73,36 +74,36 @@ export default function NewHabitPage() {
     setIsLoading(true);
     setError(null);
 
+    // Validación básica
+    if (!formData.name.trim()) {
+      setError('El nombre del hábito es requerido');
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.target_frequency < 1) {
+      setError('La frecuencia objetivo debe ser al menos 1');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        setError('Error de autenticación. Por favor, inicia sesión nuevamente.');
-        return;
-      }
+      const success = await createHabit({
+        name: formData.name.trim(),
+        description: formData.description.trim() || undefined,
+        category: formData.category,
+        target_frequency: formData.target_frequency,
+        target_unit: formData.target_unit,
+        icon: formData.icon,
+        color: formData.color
+      });
 
-      const { error: insertError } = await supabase
-        .from('habits')
-        .insert({
-          user_id: user.id,
-          name: formData.name,
-          description: formData.description || null,
-          category: formData.category,
-          target_frequency: formData.target_frequency,
-          target_unit: formData.target_unit,
-          icon: formData.icon,
-          color: formData.color,
-          is_active: true
-        });
-
-      if (insertError) {
-        console.error('Error creando hábito:', insertError);
+      if (success) {
+        // Redirigir a la página de hábitos
+        router.push('/dashboard/habits');
+      } else {
         setError('Error al crear el hábito. Inténtalo de nuevo.');
-        return;
       }
-
-      // Redirigir a la página de hábitos
-      router.push('/dashboard/habits');
     } catch (error) {
       console.error('Error inesperado:', error);
       setError('Error inesperado. Inténtalo de nuevo.');

@@ -10,7 +10,11 @@ import {
   getUserHabits,
   completeHabit,
   createHabit,
+  deleteHabit,
   getWeeklyProgress,
+  joinChallenge,
+  leaveChallenge,
+  updateChallengeProgress,
   type UserStats,
   type HabitWithProgress,
   type WeeklyProgress
@@ -217,10 +221,86 @@ export const useDashboard = () => {
     }
   }, [loadDashboardData]);
 
+  // Función para unirse a un desafío
+  const handleJoinChallenge = useCallback(async (challengeId: string): Promise<boolean> => {
+    try {
+      const success = await joinChallenge(challengeId);
+      if (success) {
+        // Recargar estadísticas para actualizar desafíos activos
+        const statsData = await getUserStats();
+        setData(prev => ({
+          ...prev,
+          stats: statsData
+        }));
+      }
+      return success;
+    } catch (error) {
+      console.error('Error uniéndose al desafío:', error);
+      return false;
+    }
+  }, []);
+
+  // Función para dejar un desafío
+  const handleLeaveChallenge = useCallback(async (challengeId: string): Promise<boolean> => {
+    try {
+      const success = await leaveChallenge(challengeId);
+      if (success) {
+        // Recargar estadísticas para actualizar desafíos activos
+        const statsData = await getUserStats();
+        setData(prev => ({
+          ...prev,
+          stats: statsData
+        }));
+      }
+      return success;
+    } catch (error) {
+      console.error('Error abandonando desafío:', error);
+      return false;
+    }
+  }, []);
+
+  // Función para actualizar progreso de desafío
+  const handleUpdateChallengeProgress = useCallback(async (challengeId: string, progressIncrement: number = 1): Promise<boolean> => {
+    try {
+      const success = await updateChallengeProgress(challengeId, progressIncrement);
+      if (success) {
+        // Recargar estadísticas
+        const statsData = await getUserStats();
+        setData(prev => ({
+          ...prev,
+          stats: statsData
+        }));
+      }
+      return success;
+    } catch (error) {
+      console.error('Error actualizando progreso de desafío:', error);
+      return false;
+    }
+  }, []);
+
+  // Función para eliminar un hábito
+  const handleDeleteHabit = useCallback(async (habitId: string): Promise<boolean> => {
+    try {
+      const success = await deleteHabit(habitId);
+      if (success) {
+        // Recargar datos del dashboard
+        await loadDashboardData();
+      }
+      return success;
+    } catch (error) {
+      console.error('Error eliminando hábito:', error);
+      return false;
+    }
+  }, [loadDashboardData]);
+
   return {
     ...data,
     completeHabit: handleCompleteHabit,
     createHabit: handleCreateHabit,
+    deleteHabit: handleDeleteHabit,
+    joinChallenge: handleJoinChallenge,
+    leaveChallenge: handleLeaveChallenge,
+    updateChallengeProgress: handleUpdateChallengeProgress,
     toggleHabit,
     refresh,
     getFormattedStats,

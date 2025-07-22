@@ -412,6 +412,9 @@ export async function completeHabit(habitId: string, amount: number = 1, notes?:
       }
     }
 
+    // Recalcular estadísticas del usuario después de completar
+    await refreshUserStats();
+
     return true;
   } catch (error) {
     console.error('Error inesperado completando hábito:', error);
@@ -476,6 +479,163 @@ export async function getUserChallenges(): Promise<UserChallenge[]> {
 }
 
 /**
+ * Unirse a un desafío
+ */
+export async function joinChallenge(challengeId: string): Promise<boolean> {
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Error obteniendo usuario:', authError);
+      return false;
+    }
+
+    // Verificar si ya está unido al desafío
+    const { data: existingChallenge } = await supabase
+      .from('user_challenges')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('challenge_id', challengeId)
+      .eq('is_active', true)
+      .single();
+
+    if (existingChallenge) {
+      console.log('Usuario ya está unido a este desafío');
+      return false;
+    }
+
+    // Unirse al desafío
+    const { error } = await supabase
+      .from('user_challenges')
+      .insert({
+        user_id: user.id,
+        challenge_id: challengeId,
+        started_at: new Date().toISOString(),
+        progress: 0,
+        is_active: true
+      });
+
+    if (error) {
+      console.error('Error uniéndose al desafío:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error inesperado uniéndose al desafío:', error);
+    return false;
+  }
+}
+
+/**
+ * Dejar/abandonar un desafío
+ */
+export async function leaveChallenge(challengeId: string): Promise<boolean> {
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Error obteniendo usuario:', authError);
+      return false;
+    }
+
+    // Marcar el desafío como inactivo
+    const { error } = await supabase
+      .from('user_challenges')
+      .update({ is_active: false })
+      .eq('user_id', user.id)
+      .eq('challenge_id', challengeId);
+
+    if (error) {
+      console.error('Error abandonando desafío:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error inesperado abandonando desafío:', error);
+    return false;
+  }
+}
+
+/**
+ * Actualizar progreso de un desafío
+ */
+export async function updateChallengeProgress(challengeId: string, progressIncrement: number = 1): Promise<boolean> {
+  try {
+    console.log('updateChallengeProgress - challengeId:', challengeId, 'progressIncrement:', progressIncrement);
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Error obteniendo usuario:', authError);
+      return false;
+    }
+
+    // Obtener progreso actual (sin incluir goal_value por ahora)
+    const { data: currentChallenge, error: fetchError } = await supabase
+      .from('user_challenges')
+      .select('progress, completed_at')
+      .eq('user_id', user.id)
+      .eq('challenge_id', challengeId)
+      .eq('is_active', true)
+      .single();
+
+    console.log('currentChallenge obtenido:', currentChallenge);
+    console.log('fetchError:', fetchError);
+
+    if (fetchError || !currentChallenge) {
+      console.error('Error obteniendo desafío actual:', fetchError);
+      return false;
+    }
+
+    // Por ahora, usar un valor fijo de 100 como meta
+    const goalValue = 100;
+    const newProgress = Math.min(
+      currentChallenge.progress + progressIncrement,
+      goalValue
+    );
+
+    console.log('Progreso actual:', currentChallenge.progress);
+    console.log('Meta del desafío:', goalValue);
+    console.log('Nuevo progreso:', newProgress);
+
+    // Verificar si se completó el desafío
+    const isCompleted = newProgress >= goalValue;
+
+    const updateData: any = {
+      progress: newProgress
+    };
+
+    if (isCompleted && !currentChallenge.completed_at) {
+      updateData.completed_at = new Date().toISOString();
+      console.log('Desafío completado, agregando fecha de finalización');
+    }
+
+    // Actualizar progreso
+    const { error } = await supabase
+      .from('user_challenges')
+      .update(updateData)
+      .eq('user_id', user.id)
+      .eq('challenge_id', challengeId);
+
+    if (error) {
+      console.error('Error actualizando progreso del desafío:', error);
+      return false;
+    }
+
+    // Recalcular estadísticas del usuario
+    await refreshUserStats();
+
+    console.log('Progreso actualizado exitosamente');
+    return true;
+  } catch (error) {
+    console.error('Error inesperado actualizando progreso:', error);
+    return false;
+  }
+}
+
+/**
  * Crear un nuevo hábito
  */
 export async function createHabit(habitData: {
@@ -514,39 +674,12 @@ export async function createHabit(habitData: {
       return false;
     }
 
+    // Recalcular estadísticas del usuario
+    await refreshUserStats();
+
     return true;
   } catch (error) {
     console.error('Error inesperado creando hábito:', error);
-    return false;
-  }
-}
-
-/**
- * Eliminar un hábito (marcarlo como inactivo)
- */
-export async function deleteHabit(habitId: string): Promise<boolean> {
-  try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      console.error('Error obteniendo usuario:', authError);
-      return false;
-    }
-
-    const { error } = await supabase
-      .from('habits')
-      .update({ is_active: false })
-      .eq('id', habitId)
-      .eq('user_id', user.id);
-
-    if (error) {
-      console.error('Error eliminando hábito:', error);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Error inesperado eliminando hábito:', error);
     return false;
   }
 }
@@ -576,6 +709,297 @@ export async function refreshUserStats(): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Error inesperado recalculando estadísticas:', error);
+    return false;
+  }
+}
+
+// ====================================
+// FUNCIONES DE PROGRESO HISTÓRICO
+// ====================================
+
+/**
+ * Obtener progreso semanal detallado
+ */
+export async function getWeeklyProgressData(): Promise<any[]> {
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Error obteniendo usuario:', authError);
+      return [];
+    }
+
+    // Obtener datos de los últimos 7 días
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 6);
+
+    const { data, error } = await supabase
+      .from('habit_logs')
+      .select(`
+        date,
+        completed_amount,
+        habit:habits(target_frequency)
+      `)
+      .eq('user_id', user.id)
+      .gte('date', startDate.toISOString().split('T')[0])
+      .lte('date', endDate.toISOString().split('T')[0])
+      .order('date');
+
+    if (error) {
+      console.error('Error obteniendo progreso semanal:', error);
+      return [];
+    }
+
+    // Procesar datos por día
+    const weeklyData = [];
+    const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+      const dateStr = currentDate.toISOString().split('T')[0];
+      
+      // Calcular progreso del día
+      const dayLogs = data?.filter(log => log.date === dateStr) || [];
+      const totalProgress = dayLogs.reduce((sum, log) => {
+        const target = (log.habit as any)?.target_frequency || 1;
+        return sum + Math.min(log.completed_amount / target, 1);
+      }, 0);
+      
+      const dayProgress = dayLogs.length > 0 ? (totalProgress / dayLogs.length) * 100 : 0;
+      
+      weeklyData.push({
+        label: days[currentDate.getDay()],
+        value: Math.round(dayProgress),
+        date: dateStr
+      });
+    }
+
+    return weeklyData;
+  } catch (error) {
+    console.error('Error inesperado obteniendo progreso semanal:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtener progreso mensual detallado
+ */
+export async function getMonthlyProgressData(): Promise<any[]> {
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Error obteniendo usuario:', authError);
+      return [];
+    }
+
+    // Obtener datos del mes actual por semanas
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const { data, error } = await supabase
+      .from('habit_logs')
+      .select(`
+        date,
+        completed_amount,
+        habit:habits(target_frequency)
+      `)
+      .eq('user_id', user.id)
+      .gte('date', startOfMonth.toISOString().split('T')[0])
+      .lte('date', endOfMonth.toISOString().split('T')[0])
+      .order('date');
+
+    if (error) {
+      console.error('Error obteniendo progreso mensual:', error);
+      return [];
+    }
+
+    // Agrupar por semanas
+    const monthlyData = [];
+    const weeks = Math.ceil(endOfMonth.getDate() / 7);
+    
+    for (let week = 0; week < weeks; week++) {
+      const weekStart = new Date(startOfMonth);
+      weekStart.setDate(1 + (week * 7));
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      
+      const weekLogs = data?.filter(log => {
+        const logDate = new Date(log.date);
+        return logDate >= weekStart && logDate <= weekEnd;
+      }) || [];
+      
+      const totalProgress = weekLogs.reduce((sum, log) => {
+        const target = (log.habit as any)?.target_frequency || 1;
+        return sum + Math.min(log.completed_amount / target, 1);
+      }, 0);
+      
+      const weekProgress = weekLogs.length > 0 ? (totalProgress / weekLogs.length) * 100 : 0;
+      
+      monthlyData.push({
+        label: `S${week + 1}`,
+        value: Math.round(weekProgress),
+        weekStart: weekStart.toISOString().split('T')[0],
+        weekEnd: weekEnd.toISOString().split('T')[0]
+      });
+    }
+
+    return monthlyData;
+  } catch (error) {
+    console.error('Error inesperado obteniendo progreso mensual:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtener actividad reciente del usuario
+ */
+export async function getRecentActivity(): Promise<any[]> {
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Error obteniendo usuario:', authError);
+      return [];
+    }
+
+    // Obtener logs de hábitos recientes
+    const { data: habitLogs, error: habitError } = await supabase
+      .from('habit_logs')
+      .select(`
+        id,
+        date,
+        completed_amount,
+        created_at,
+        habit:habits(name, icon, target_frequency)
+      `)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    // Obtener desafíos unidos recientemente
+    const { data: challengeLogs, error: challengeError } = await supabase
+      .from('user_challenges')
+      .select(`
+        id,
+        started_at,
+        challenge:challenges(title, icon)
+      `)
+      .eq('user_id', user.id)
+      .order('started_at', { ascending: false })
+      .limit(5);
+
+    if (habitError) console.error('Error obteniendo logs de hábitos:', habitError);
+    if (challengeError) console.error('Error obteniendo logs de desafíos:', challengeError);
+
+    const activities: any[] = [];
+
+    // Procesar logs de hábitos
+    if (habitLogs) {
+      habitLogs.forEach(log => {
+        const habit = log.habit as any;
+        const points = Math.min(log.completed_amount, habit.target_frequency) * 10;
+        activities.push({
+          id: `habit_${log.id}`,
+          type: 'habit',
+          action: `Completó hábito "${habit.name}"`,
+          icon: habit.icon || '✅',
+          points: `+${points}`,
+          timestamp: log.created_at,
+          time: formatRelativeTime(log.created_at)
+        });
+      });
+    }
+
+    // Procesar logs de desafíos
+    if (challengeLogs) {
+      challengeLogs.forEach(log => {
+        const challenge = log.challenge as any;
+        activities.push({
+          id: `challenge_${log.id}`,
+          type: 'challenge',
+          action: `Se unió al desafío "${challenge.title}"`,
+          icon: challenge.icon || '🎯',
+          points: '+50',
+          timestamp: log.started_at,
+          time: formatRelativeTime(log.started_at)
+        });
+      });
+    }
+
+    // Ordenar por timestamp y limitar a 15 actividades
+    activities.sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+    
+    return activities.slice(0, 15);
+
+  } catch (error) {
+    console.error('Error inesperado obteniendo actividad reciente:', error);
+    return [];
+  }
+}
+
+/**
+ * Formatear tiempo relativo
+ */
+function formatRelativeTime(timestamp: string): string {
+  const now = new Date();
+  const date = new Date(timestamp);
+  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+  
+  if (diffInHours < 1) {
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    if (diffInMinutes < 1) {
+      return 'Ahora mismo';
+    }
+    return `Hace ${diffInMinutes} minuto${diffInMinutes > 1 ? 's' : ''}`;
+  } else if (diffInHours < 24) {
+    return `Hace ${diffInHours} hora${diffInHours > 1 ? 's' : ''}`;
+  } else {
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return 'Ayer';
+    if (diffInDays < 7) return `Hace ${diffInDays} días`;
+    return date.toLocaleDateString();
+  }
+}
+
+/**
+ * Eliminar un hábito (marcado como inactivo para preservar datos históricos)
+ */
+export async function deleteHabit(habitId: string): Promise<boolean> {
+  try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Error obteniendo usuario:', authError);
+      return false;
+    }
+
+    // Marcar el hábito como inactivo en lugar de eliminarlo
+    const { error: updateError } = await supabase
+      .from('habits')
+      .update({
+        is_active: false,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', habitId)
+      .eq('user_id', user.id);
+
+    if (updateError) {
+      console.error('Error eliminando hábito:', updateError);
+      return false;
+    }
+
+    // Recalcular estadísticas del usuario
+    await refreshUserStats();
+
+    return true;
+  } catch (error) {
+    console.error('Error inesperado eliminando hábito:', error);
     return false;
   }
 }

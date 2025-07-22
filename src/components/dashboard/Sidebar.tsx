@@ -244,18 +244,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
         className={`
           fixed top-0 left-0 z-40 h-screen w-64 transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:static lg:inset-0
+          lg:translate-x-0 lg:sticky lg:top-0
           ${isDark 
             ? 'bg-slate-900 border-r border-slate-700' 
             : 'bg-white border-r border-slate-200'
           }
-          shadow-xl
+          shadow-xl overflow-hidden
           ${className}
         `}
       >
         <div className="flex flex-col h-full">
           {/* Header del Sidebar */}
-          <div className={`flex items-center justify-between p-4 ${isDark ? 'border-b border-slate-700' : 'border-b border-slate-200'}`}>
+          <div className={`flex items-center justify-between p-4 flex-shrink-0 ${isDark ? 'border-b border-slate-700' : 'border-b border-slate-200'}`}>
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center w-10 h-10 bg-violet-600 rounded-xl shadow-lg">
                 <span className="text-xl">🏥</span>
@@ -283,9 +283,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle, className = '' }) =
           </div>
 
           {/* Navegación principal */}
-          <div className="flex-1 px-4 py-6 overflow-y-auto sidebar-scroll">
-            <nav className="space-y-6" aria-label="Navegación principal">
-              {/* Navegación principal */}
+          <div className="flex-1 px-4 py-6 overflow-y-auto custom-scrollbar">
+            <nav className="space-y-6" aria-label="Navegación principal">{/* Navegación principal */}
               <div>
                 <h2 className={`px-4 text-xs font-semibold uppercase tracking-wide mb-3 ${
                   isDark ? 'text-slate-400' : 'text-slate-500'
